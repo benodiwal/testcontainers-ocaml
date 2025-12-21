@@ -1,26 +1,29 @@
-(lang dune 3.17)
+(lang dune 3.20)
 
 (name testcontainers_ocaml)
 
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github benodiwal/testcontainers_ocaml))
 
-(authors "Author Name <author@example.com>")
+(authors "Sachin Beniwal <sachinbeniwal0101.com>")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
+(maintainers "Sachin Beniwal <sachinbeniwal0101.com>")
 
-(license LICENSE)
+(license Apache-2.0)
 
 (documentation https://url/to/documentation)
 
 (package
  (name testcontainers_ocaml)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "Docker containers for OCaml integration tests")
+ (description "TestContainers is an OCaml library that provides lightweight, throwaway
+      instances of databases, message brokers, or any service that runs in a
+      Docker container. Built on Eio for OCaml 5+, it enables reliable
+      integration testing with real services instead of mocks.")
  (depends ocaml)
  (tags
-  ("add topics" "to describe" your project)))
+  (docker testing integration-testing containers)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
