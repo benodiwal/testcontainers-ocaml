@@ -1,0 +1,4 @@
+(executable
+ (public_name testcontainers_ocaml)
+ (name main)
+ (libraries testcontainers_ocaml))

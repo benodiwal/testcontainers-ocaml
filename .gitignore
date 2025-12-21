@@ -1,0 +1,24 @@
+# Ignore the artifacts from building the project
+_build/
+
+# Ignore the _opam directory which acts as a cache for the opam switch
+_opam/
+
+# OCaml/editor-specific files
+*.merlin
+.ocp-indent
+
+# OS-specific files (common examples)
+.DS_Store
+__pycache__
+*.install
+
+# Vim swap files
+*.swp
+*.swo
+
+# Emacs lock files
+.#*
+
+# VS Code settings directory
+.vscode
