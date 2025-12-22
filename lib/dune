@@ -1,2 +1,3 @@
 (library
- (name testcontainers_ocaml))
+ (name testcontainers_ocaml)
+ (public_name testcontainers_ocaml))
