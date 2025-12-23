@@ -1,0 +1,1 @@
+(** RabbitMQ container module - placeholder *)

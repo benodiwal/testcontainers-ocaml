@@ -1,0 +1,6 @@
+(library
+ (name testcontainers_postgres)
+ (public_name testcontainers-postgres)
+ (libraries testcontainers lwt)
+ (preprocess
+  (pps lwt_ppx)))

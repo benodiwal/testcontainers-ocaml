@@ -1,3 +1,15 @@
 (library
- (name testcontainers_ocaml)
- (public_name testcontainers_ocaml))
+ (name testcontainers)
+ (public_name testcontainers)
+ (libraries
+  lwt
+  lwt.unix
+  cohttp-lwt-unix
+  yojson
+  re
+  uri
+  logs
+  fmt
+  unix)
+ (preprocess
+  (pps lwt_ppx)))

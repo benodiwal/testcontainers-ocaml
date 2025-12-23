@@ -1,0 +1,1 @@
+(** Redis container module - placeholder *)

@@ -1,2 +1,5 @@
 (test
- (name test_testcontainers_ocaml))
+ (name test_testcontainers)
+ (libraries testcontainers alcotest alcotest-lwt lwt lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))
