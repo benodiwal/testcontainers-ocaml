@@ -23,6 +23,7 @@ let refresh_info t =
   t.info <- Some info;
   Lwt.return info
 
+(* TODO: Refactor *)
 let mapped_port t port =
   (* Docker needs a moment after start to populate port bindings.
      Poll up to 10 times with 100ms intervals. *)
@@ -145,9 +146,45 @@ let with_container request f =
     (fun () -> f container)
     (fun () -> terminate container)
 
-(* Copy operations - simplified for now *)
-let copy_file_to _t ~src:_ ~dest:_ =
-  Lwt.fail_with "copy_file_to not yet implemented"
+(* Copy operations using Docker archive API *)
 
-let copy_file_from _t ~src:_ ~dest:_ =
-  Lwt.fail_with "copy_file_from not yet implemented"
+(* Create a tar archive from a file *)
+let create_tar_from_file ~src =
+  let filename = Filename.basename src in
+  let dir = Filename.dirname src in
+  let cmd = Lwt_process.shell (Printf.sprintf "tar -c -C %s %s" (Filename.quote dir) (Filename.quote filename)) in
+  Lwt_process.pread cmd
+
+(* Create a tar archive from string content *)
+let create_tar_from_content ~filename ~content =
+  (* Create temp file, tar it, return tar data *)
+  let tmp_dir = Filename.get_temp_dir_name () in
+  let tmp_file = Filename.concat tmp_dir filename in
+  let* () =
+    Lwt_io.with_file ~mode:Lwt_io.Output tmp_file (fun oc ->
+      Lwt_io.write oc content)
+  in
+  let cmd = Lwt_process.shell (Printf.sprintf "tar -c -C %s %s" (Filename.quote tmp_dir) (Filename.quote filename)) in
+  let* tar_data = Lwt_process.pread cmd in
+  let* () = Lwt_unix.unlink tmp_file in
+  Lwt.return tar_data
+
+(* Extract a tar archive to a directory *)
+let extract_tar_to_dir ~dest ~data =
+  let cmd = Lwt_process.shell (Printf.sprintf "tar -x -C %s" (Filename.quote dest)) in
+  Lwt_process.pwrite cmd data
+
+let copy_file_to t ~src ~dest =
+  let* tar_data = create_tar_from_file ~src in
+  Docker_client.put_archive t.id ~path:dest ~data:tar_data
+
+let copy_file_from t ~src ~dest =
+  let* tar_data = Docker_client.get_archive t.id ~path:src in
+  let dest_dir = Filename.dirname dest in
+  extract_tar_to_dir ~dest:dest_dir ~data:tar_data
+
+let copy_content_to t ~content ~dest =
+  let filename = Filename.basename dest in
+  let dest_dir = Filename.dirname dest in
+  let* tar_data = create_tar_from_content ~filename ~content in
+  Docker_client.put_archive t.id ~path:dest_dir ~data:tar_data

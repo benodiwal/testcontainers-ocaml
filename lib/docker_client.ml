@@ -427,3 +427,78 @@ let version () =
   let version = Json.get_string "Version" json |> Option.value ~default:"unknown" in
   let api_version = Json.get_string "ApiVersion" json |> Option.value ~default:"unknown" in
   Lwt.return (version, api_version)
+
+(* Archive operations for file copy *)
+let put_archive id ~path ~data =
+  let encoded_path = Uri.pct_encode path in
+  let api_path = Printf.sprintf "/containers/%s/archive?path=%s" id encoded_path in
+  let* sock = connect_to_docker () in
+  let full_path = Printf.sprintf "/%s%s" api_version api_path in
+  let content_length = String.length data in
+  let request =
+    Printf.sprintf "PUT %s HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/x-tar\r\nContent-Length: %d\r\nConnection: close\r\n\r\n"
+      full_path content_length
+  in
+  let ic = Lwt_io.of_fd ~mode:Lwt_io.Input sock in
+  let oc = Lwt_io.of_fd ~mode:Lwt_io.Output sock in
+  let* () = Lwt_io.write oc request in
+  let* () = Lwt_io.write oc data in
+  let* () = Lwt_io.flush oc in
+  let* (status, body) = read_http_response ic in
+  let* () = Lwt_io.close ic in
+  if status >= 200 && status < 300 then
+    Lwt.return_unit
+  else
+    let message =
+      try
+        let json = Yojson.Safe.from_string body in
+        Json.get_string "message" json |> Option.value ~default:body
+      with _ -> body
+    in
+    Error.fail_docker_error ~status ~message
+
+let get_archive id ~path =
+  let encoded_path = Uri.pct_encode path in
+  let api_path = Printf.sprintf "/containers/%s/archive?path=%s" id encoded_path in
+  let* resp = make_request `GET api_path () in
+  handle_response resp
+
+(* Network operations *)
+let create_network ~driver name =
+  let body = Yojson.Safe.to_string (`Assoc [
+    ("Name", `String name);
+    ("Driver", `String driver);
+    ("CheckDuplicate", `Bool true);
+  ]) in
+  let* resp = make_request `POST "/networks/create" ~body () in
+  let* body_str = handle_response resp in
+  let json = Yojson.Safe.from_string body_str in
+  Lwt.return (Json.get_string_exn "Id" json)
+
+let remove_network id =
+  let path = Printf.sprintf "/networks/%s" id in
+  let* resp = make_request `DELETE path () in
+  let* _ = handle_response resp in
+  Lwt.return_unit
+
+let connect_container_to_network ~network_id ~container_id ~aliases =
+  let aliases_json = `List (List.map (fun a -> `String a) aliases) in
+  let body = Yojson.Safe.to_string (`Assoc [
+    ("Container", `String container_id);
+    ("EndpointConfig", `Assoc [
+      ("Aliases", aliases_json);
+    ]);
+  ]) in
+  let path = Printf.sprintf "/networks/%s/connect" network_id in
+  let* resp = make_request `POST path ~body () in
+  let* _ = handle_response resp in
+  Lwt.return_unit
+
+let disconnect_container_from_network ~network_id ~container_id =
+  let body = Yojson.Safe.to_string (`Assoc [
+    ("Container", `String container_id);
+  ]) in
+  let path = Printf.sprintf "/networks/%s/disconnect" network_id in
+  let* resp = make_request `POST path ~body () in
+  let* _ = handle_response resp in
+  Lwt.return_unit

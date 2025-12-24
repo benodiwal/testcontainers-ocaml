@@ -1,0 +1,6 @@
+(library
+ (name testcontainers_mongo)
+ (public_name testcontainers-mongo)
+ (libraries testcontainers lwt)
+ (preprocess
+  (pps lwt_ppx)))

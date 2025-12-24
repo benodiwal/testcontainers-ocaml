@@ -1,9 +1,16 @@
 (executables
- (names postgres_example redis_example basic_example)
+ (names
+  postgres_example
+  redis_example
+  basic_example
+  mysql_example
+  mongo_example)
  (libraries
   testcontainers
   testcontainers-postgres
   testcontainers-redis
+  testcontainers-mysql
+  testcontainers-mongo
   lwt
   lwt.unix)
  (preprocess

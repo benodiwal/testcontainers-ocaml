@@ -33,3 +33,4 @@ module Docker_client = Docker_client
 module Container_request = Container_request
 module Wait_strategy = Wait_strategy
 module Container = Container
+module Network = Network
