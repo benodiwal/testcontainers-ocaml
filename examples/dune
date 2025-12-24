@@ -1,0 +1,10 @@
+(executables
+ (names postgres_example redis_example basic_example)
+ (libraries
+  testcontainers
+  testcontainers-postgres
+  testcontainers-redis
+  lwt
+  lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))
