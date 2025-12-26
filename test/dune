@@ -1,5 +1,33 @@
 (test
  (name test_testcontainers)
- (libraries testcontainers alcotest alcotest-lwt lwt lwt.unix)
+ (modules
+  test_testcontainers
+  test_helpers
+  test_port
+  test_volume
+  test_container_request
+  test_wait_strategy
+  test_error
+  test_docker_client
+  test_container
+  test_file_copy
+  test_network
+  test_wait_strategy_integration
+  test_postgres
+  test_redis
+  test_rabbitmq
+  test_mysql
+  test_mongo)
+ (libraries
+  testcontainers
+  testcontainers-postgres
+  testcontainers-redis
+  testcontainers-rabbitmq
+  testcontainers-mysql
+  testcontainers-mongo
+  alcotest
+  alcotest-lwt
+  lwt
+  lwt.unix)
  (preprocess
   (pps lwt_ppx)))

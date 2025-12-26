@@ -148,11 +148,12 @@ let with_container request f =
 
 (* Copy operations using Docker archive API *)
 
-(* Create a tar archive from a file *)
+(* Create a tar archive from a file, stripping extended attributes for macOS compatibility *)
 let create_tar_from_file ~src =
   let filename = Filename.basename src in
   let dir = Filename.dirname src in
-  let cmd = Lwt_process.shell (Printf.sprintf "tar -c -C %s %s" (Filename.quote dir) (Filename.quote filename)) in
+  (* Use COPYFILE_DISABLE=1 to strip macOS extended attributes *)
+  let cmd = Lwt_process.shell (Printf.sprintf "COPYFILE_DISABLE=1 tar -c -C %s %s" (Filename.quote dir) (Filename.quote filename)) in
   Lwt_process.pread cmd
 
 (* Create a tar archive from string content *)
@@ -164,7 +165,17 @@ let create_tar_from_content ~filename ~content =
     Lwt_io.with_file ~mode:Lwt_io.Output tmp_file (fun oc ->
       Lwt_io.write oc content)
   in
-  let cmd = Lwt_process.shell (Printf.sprintf "tar -c -C %s %s" (Filename.quote tmp_dir) (Filename.quote filename)) in
+  (* Strip extended attributes on macOS to avoid Docker errors *)
+  let* () =
+    Lwt.catch
+      (fun () ->
+        let xattr_cmd = Lwt_process.shell (Printf.sprintf "xattr -c %s 2>/dev/null" (Filename.quote tmp_file)) in
+        let* _ = Lwt_process.pread xattr_cmd in
+        Lwt.return_unit)
+      (fun _ -> Lwt.return_unit)
+  in
+  (* Use COPYFILE_DISABLE=1 to prevent ._* resource fork files *)
+  let cmd = Lwt_process.shell (Printf.sprintf "COPYFILE_DISABLE=1 tar -c -C %s %s" (Filename.quote tmp_dir) (Filename.quote filename)) in
   let* tar_data = Lwt_process.pread cmd in
   let* () = Lwt_unix.unlink tmp_file in
   Lwt.return tar_data

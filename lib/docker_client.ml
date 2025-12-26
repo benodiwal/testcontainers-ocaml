@@ -435,27 +435,42 @@ let put_archive id ~path ~data =
   let* sock = connect_to_docker () in
   let full_path = Printf.sprintf "/%s%s" api_version api_path in
   let content_length = String.length data in
-  let request =
+  let header =
     Printf.sprintf "PUT %s HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/x-tar\r\nContent-Length: %d\r\nConnection: close\r\n\r\n"
       full_path content_length
   in
+  let request = header ^ data in
   let ic = Lwt_io.of_fd ~mode:Lwt_io.Input sock in
   let oc = Lwt_io.of_fd ~mode:Lwt_io.Output sock in
   let* () = Lwt_io.write oc request in
-  let* () = Lwt_io.write oc data in
   let* () = Lwt_io.flush oc in
   let* (status, body) = read_http_response ic in
   let* () = Lwt_io.close ic in
   if status >= 200 && status < 300 then
     Lwt.return_unit
-  else
-    let message =
+  else begin
+    (* Docker on macOS returns 500 for lsetxattr errors but the file is still copied *)
+    let is_xattr_error =
       try
         let json = Yojson.Safe.from_string body in
-        Json.get_string "message" json |> Option.value ~default:body
-      with _ -> body
+        let msg = Json.get_string "message" json |> Option.value ~default:"" in
+        String.length msg > 0 && (
+          String.sub msg 0 (min 9 (String.length msg)) = "lsetxattr" ||
+          String.sub msg 0 (min 10 (String.length msg)) = "lgetxattr")
+      with _ -> false
     in
-    Error.fail_docker_error ~status ~message
+    if is_xattr_error then
+      (* Ignore xattr errors - the file is still copied successfully *)
+      Lwt.return_unit
+    else
+      let message =
+        try
+          let json = Yojson.Safe.from_string body in
+          Json.get_string "message" json |> Option.value ~default:body
+        with _ -> body
+      in
+      Error.fail_docker_error ~status ~message
+  end
 
 let get_archive id ~path =
   let encoded_path = Uri.pct_encode path in
