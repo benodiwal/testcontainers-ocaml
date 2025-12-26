@@ -205,8 +205,12 @@ let make_request meth path ?body () =
       meth_str full_path content_length
       (Option.value body ~default:"")
   in
-  let ic = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock in
-  let oc = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock in
+  let ic =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock
+  in
+  let oc =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock
+  in
   Lwt.finalize
     (fun () ->
       let* () = Lwt_io.write oc request in
@@ -506,8 +510,12 @@ let put_archive id ~path ~data =
       full_path content_length
   in
   let request = header ^ data in
-  let ic = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock in
-  let oc = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock in
+  let ic =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock
+  in
+  let oc =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock
+  in
   let* status, body =
     Lwt.finalize
       (fun () ->

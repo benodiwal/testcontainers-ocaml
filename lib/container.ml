@@ -107,8 +107,8 @@ let exec t cmd =
     if running then begin
       let* () = Lwt_unix.sleep 0.1 in
       wait_for_completion ()
-    end else
-      Lwt.return exit_code
+    end
+    else Lwt.return exit_code
   in
   let* exit_code = wait_for_completion () in
   Lwt.return (exit_code, output)
