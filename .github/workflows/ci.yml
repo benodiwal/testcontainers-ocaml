@@ -3,8 +3,22 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.github/**'
+      - '!.github/workflows/ci.yml'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.github/**'
+      - '!.github/workflows/ci.yml'
 
 jobs:
   build:
@@ -50,8 +64,8 @@ jobs:
         with:
           ocaml-compiler: "5.2"
 
-      - name: Install dependencies
-        run: opam install . --deps-only ocamlformat
+      - name: Install ocamlformat
+        run: opam install ocamlformat.0.28.1
 
       - name: Check formatting
         run: opam exec -- dune build @fmt
