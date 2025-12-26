@@ -28,7 +28,6 @@
 
 - [Custom Containers](./advanced/custom-containers.md)
 - [Best Practices](./advanced/best-practices.md)
-- [CI/CD Integration](./advanced/ci-cd.md)
 
 # Reference
 

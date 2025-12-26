@@ -194,13 +194,17 @@ let make_request meth path ?body () =
       meth_str full_path content_length
       (Option.value body ~default:"")
   in
-  let ic = Lwt_io.of_fd ~mode:Lwt_io.Input sock in
-  let oc = Lwt_io.of_fd ~mode:Lwt_io.Output sock in
-  let* () = Lwt_io.write oc request in
-  let* () = Lwt_io.flush oc in
-  let* result = read_http_response ic in
-  let* () = Lwt_io.close ic in
-  Lwt.return result
+  let ic = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock in
+  let oc = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock in
+  Lwt.finalize
+    (fun () ->
+      let* () = Lwt_io.write oc request in
+      let* () = Lwt_io.flush oc in
+      read_http_response ic)
+    (fun () ->
+      let* () = Lwt_io.close oc in
+      let* () = Lwt_io.close ic in
+      Lwt_unix.close sock)
 
 let handle_response (status, body) =
   if status >= 200 && status < 300 then Lwt.return body
@@ -491,12 +495,19 @@ let put_archive id ~path ~data =
       full_path content_length
   in
   let request = header ^ data in
-  let ic = Lwt_io.of_fd ~mode:Lwt_io.Input sock in
-  let oc = Lwt_io.of_fd ~mode:Lwt_io.Output sock in
-  let* () = Lwt_io.write oc request in
-  let* () = Lwt_io.flush oc in
-  let* status, body = read_http_response ic in
-  let* () = Lwt_io.close ic in
+  let ic = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock in
+  let oc = Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock in
+  let* status, body =
+    Lwt.finalize
+      (fun () ->
+        let* () = Lwt_io.write oc request in
+        let* () = Lwt_io.flush oc in
+        read_http_response ic)
+      (fun () ->
+        let* () = Lwt_io.close oc in
+        let* () = Lwt_io.close ic in
+        Lwt_unix.close sock)
+  in
   if status >= 200 && status < 300 then Lwt.return_unit
   else begin
     (* Docker on macOS returns 500 for lsetxattr errors but the file is still copied *)
