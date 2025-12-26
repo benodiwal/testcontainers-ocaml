@@ -32,7 +32,7 @@ Full documentation: [https://benodiwal.github.io/testcontainers-ocaml](https://b
 
 ## Requirements
 
-- OCaml >= 4.14
+- OCaml >= 5.0
 - Docker
 
 ## License

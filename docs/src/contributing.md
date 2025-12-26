@@ -6,7 +6,7 @@ Thank you for your interest in contributing to Testcontainers OCaml! This guide 
 
 ### Prerequisites
 
-- OCaml 4.14 or later
+- OCaml 5.0 or later
 - opam 2.0 or later
 - Docker
 - dune build system
@@ -213,7 +213,7 @@ val with_myservice : ?config:(config -> config) ->
 (package
  (name testcontainers-myservice)
  (depends
-  (ocaml (>= 4.14))
+  (ocaml (>= 5.0))
   (testcontainers (>= 1.0))
   (lwt (>= 5.6))))
 ```

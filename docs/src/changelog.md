@@ -76,10 +76,10 @@ This is the first release, no migration needed.
 
 | OCaml Version | Status |
 |---------------|--------|
+| 5.2.x | Supported |
 | 5.1.x | Supported |
 | 5.0.x | Supported |
-| 4.14.x | Supported |
-| < 4.14 | Not supported |
+| < 5.0 | Not supported |
 
 | Docker Version | Status |
 |----------------|--------|

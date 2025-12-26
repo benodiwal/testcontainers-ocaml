@@ -4,7 +4,7 @@
 
 Before installing Testcontainers OCaml, ensure you have:
 
-1. **OCaml 4.14+** and **opam 2.0+**
+1. **OCaml 5.0+** and **opam 2.0+**
 2. **Docker** installed and running
 3. **dune** build system
 
@@ -39,7 +39,7 @@ opam install testcontainers-rabbitmq
 (package
  (name my_project)
  (depends
-  (ocaml (>= 4.14))
+  (ocaml (>= 5.0))
   (testcontainers (>= 1.0))
   (testcontainers-postgres (>= 1.0))  ; if using PostgreSQL
   (alcotest :with-test)

@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5.1
 
@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Setup OCaml
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5.1
           cache-prefix: v1
@@ -94,13 +94,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ocaml-version: ['4.14', '5.0', '5.1']
+        ocaml-version: ['5.0', '5.1', '5.2']
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup OCaml ${{ matrix.ocaml-version }}
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-version }}
 
@@ -349,7 +349,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ocaml/setup-ocaml@v2
+      - uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5.1
       - run: opam install ocamlformat
@@ -359,7 +359,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ocaml/setup-ocaml@v2
+      - uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5.1
       - run: opam install . --deps-only
@@ -370,7 +370,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
-      - uses: ocaml/setup-ocaml@v2
+      - uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5.1
       - run: opam install . --deps-only --with-test
@@ -381,7 +381,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
-      - uses: ocaml/setup-ocaml@v2
+      - uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5.1
       - run: |
