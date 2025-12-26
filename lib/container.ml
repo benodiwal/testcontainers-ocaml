@@ -101,7 +101,16 @@ let logs ?since:_ ?(follow = false) t =
 let exec t cmd =
   let* exec_id = Docker_client.exec_create t.id cmd in
   let* output = Docker_client.exec_start exec_id in
-  let* exit_code, _running = Docker_client.exec_inspect exec_id in
+  (* Poll until exec is no longer running *)
+  let rec wait_for_completion () =
+    let* exit_code, running = Docker_client.exec_inspect exec_id in
+    if running then begin
+      let* () = Lwt_unix.sleep 0.1 in
+      wait_for_completion ()
+    end else
+      Lwt.return exit_code
+  in
+  let* exit_code = wait_for_completion () in
   Lwt.return (exit_code, output)
 
 let ensure_image_exists image =

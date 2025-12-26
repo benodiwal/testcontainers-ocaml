@@ -164,7 +164,18 @@ let read_http_response ic =
           end
         in
         read_chunks []
-    | None -> Lwt.return ""
+    | None ->
+        (* No Content-Length and not chunked - read until EOF (for streaming responses) *)
+        let rec read_all acc =
+          Lwt.catch
+            (fun () ->
+              let buf = Bytes.create 4096 in
+              let* n = Lwt_io.read_into ic buf 0 4096 in
+              if n = 0 then Lwt.return (String.concat "" (List.rev acc))
+              else read_all (Bytes.sub_string buf 0 n :: acc))
+            (fun _ -> Lwt.return (String.concat "" (List.rev acc)))
+        in
+        read_all []
   in
   Lwt.return (status_code, body)
 
