@@ -1,7 +1,6 @@
 [book]
 authors = ["benodiwal"]
 language = "en"
-multilingual = false
 src = "src"
 title = "Testcontainers OCaml"
 description = "Integration testing with real dependencies in OCaml"
