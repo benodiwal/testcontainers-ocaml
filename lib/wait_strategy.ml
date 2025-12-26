@@ -23,14 +23,15 @@ let default_timeout = 60.0
 let default_poll_interval = 0.5
 
 let make ~name ~strategy =
-  { name; timeout = default_timeout; poll_interval = default_poll_interval; strategy }
+  {
+    name;
+    timeout = default_timeout;
+    poll_interval = default_poll_interval;
+    strategy;
+  }
 
-let with_timeout timeout t =
-  { t with timeout }
-
-let with_poll_interval interval t =
-  { t with poll_interval = interval }
-
+let with_timeout timeout t = { t with timeout }
+let with_poll_interval interval t = { t with poll_interval = interval }
 let name t = t.name
 let timeout t = t.timeout
 
@@ -39,12 +40,10 @@ let poll_until ~timeout ~interval ~check =
   let start_time = Unix.gettimeofday () in
   let rec loop () =
     let elapsed = Unix.gettimeofday () -. start_time in
-    if elapsed >= timeout then
-      Lwt.return_false
+    if elapsed >= timeout then Lwt.return_false
     else
       let* result = check () in
-      if result then
-        Lwt.return_true
+      if result then Lwt.return_true
       else begin
         let* () = Lwt_unix.sleep interval in
         loop ()
@@ -69,12 +68,15 @@ let for_listening_port ?(timeout = default_timeout) port =
         (fun _ -> Lwt.return_false)
     in
     let* success = poll_until ~timeout ~interval:default_poll_interval ~check in
-    if success then
-      Lwt.return_unit
+    if success then Lwt.return_unit
     else
-      Error.fail_wait_timeout ~strategy:(Printf.sprintf "listening_port(%d)" port.Port.port) ~timeout
+      Error.fail_wait_timeout
+        ~strategy:(Printf.sprintf "listening_port(%d)" port.Port.port)
+        ~timeout
   in
-  make ~name:(Printf.sprintf "listening_port(%s)" (Port.to_string port)) ~strategy
+  make
+    ~name:(Printf.sprintf "listening_port(%s)" (Port.to_string port))
+    ~strategy
   |> with_timeout timeout
 
 (* Wait for a specific log message *)
@@ -93,20 +95,23 @@ let for_log ?(occurrence = 1) ?(timeout = default_timeout) message =
               if substr = message then begin
                 incr count;
                 idx := pos + String.length message
-              end else
-                idx := pos + 1
-            end else
-              idx := String.length logs
+              end
+              else idx := pos + 1
+            end
+            else idx := String.length logs
       done;
       Lwt.return (!count >= occurrence)
     in
     let* success = poll_until ~timeout ~interval:default_poll_interval ~check in
-    if success then
-      Lwt.return_unit
+    if success then Lwt.return_unit
     else
-      Error.fail_wait_timeout ~strategy:(Printf.sprintf "log(%s)" message) ~timeout
+      Error.fail_wait_timeout
+        ~strategy:(Printf.sprintf "log(%s)" message)
+        ~timeout
   in
-  make ~name:(Printf.sprintf "log(%s, occurrence=%d)" message occurrence) ~strategy
+  make
+    ~name:(Printf.sprintf "log(%s, occurrence=%d)" message occurrence)
+    ~strategy
   |> with_timeout timeout
 
 (* Wait for a log message matching a regex *)
@@ -119,12 +124,15 @@ let for_log_regex ?(occurrence = 1) ?(timeout = default_timeout) pattern =
       Lwt.return (List.length matches >= occurrence)
     in
     let* success = poll_until ~timeout ~interval:default_poll_interval ~check in
-    if success then
-      Lwt.return_unit
+    if success then Lwt.return_unit
     else
-      Error.fail_wait_timeout ~strategy:(Printf.sprintf "log_regex(%s)" pattern) ~timeout
+      Error.fail_wait_timeout
+        ~strategy:(Printf.sprintf "log_regex(%s)" pattern)
+        ~timeout
   in
-  make ~name:(Printf.sprintf "log_regex(%s, occurrence=%d)" pattern occurrence) ~strategy
+  make
+    ~name:(Printf.sprintf "log_regex(%s, occurrence=%d)" pattern occurrence)
+    ~strategy
   |> with_timeout timeout
 
 (* Simple HTTP request for health checks *)
@@ -134,8 +142,11 @@ let http_get host port path =
     (fun () ->
       let addr = Unix.ADDR_INET (Unix.inet_addr_of_string host, port) in
       let* () = Lwt_unix.connect sock addr in
-      let request = Printf.sprintf "GET %s HTTP/1.1\r\nHost: %s:%d\r\nConnection: close\r\n\r\n"
-        path host port in
+      let request =
+        Printf.sprintf
+          "GET %s HTTP/1.1\r\nHost: %s:%d\r\nConnection: close\r\n\r\n" path
+          host port
+      in
       let ic = Lwt_io.of_fd ~mode:Lwt_io.Input sock in
       let oc = Lwt_io.of_fd ~mode:Lwt_io.Output sock in
       let* () = Lwt_io.write oc request in
@@ -151,8 +162,8 @@ let http_get host port path =
     (fun () -> Lwt_unix.close sock)
 
 (* Wait for HTTP endpoint to return expected status *)
-let for_http ?(port = Port.tcp 80) ?(status_codes = [200]) ?(timeout = default_timeout)
-    ?method_:_ path =
+let for_http ?(port = Port.tcp 80) ?(status_codes = [ 200 ])
+    ?(timeout = default_timeout) ?method_:_ path =
   let strategy ctx =
     let* host_port = ctx.get_mapped_port port in
     let check () =
@@ -163,13 +174,13 @@ let for_http ?(port = Port.tcp 80) ?(status_codes = [200]) ?(timeout = default_t
         (fun _ -> Lwt.return_false)
     in
     let* success = poll_until ~timeout ~interval:default_poll_interval ~check in
-    if success then
-      Lwt.return_unit
+    if success then Lwt.return_unit
     else
-      Error.fail_wait_timeout ~strategy:(Printf.sprintf "http(%s)" path) ~timeout
+      Error.fail_wait_timeout
+        ~strategy:(Printf.sprintf "http(%s)" path)
+        ~timeout
   in
-  make ~name:(Printf.sprintf "http(%s)" path) ~strategy
-  |> with_timeout timeout
+  make ~name:(Printf.sprintf "http(%s)" path) ~strategy |> with_timeout timeout
 
 (* Wait for command execution to return expected exit code *)
 let for_exec ?(timeout = default_timeout) ?(exit_code = 0) cmd =
@@ -177,15 +188,16 @@ let for_exec ?(timeout = default_timeout) ?(exit_code = 0) cmd =
     let check () =
       Lwt.catch
         (fun () ->
-          let* (actual_code, _output) = ctx.exec cmd in
+          let* actual_code, _output = ctx.exec cmd in
           Lwt.return (actual_code = exit_code))
         (fun _ -> Lwt.return_false)
     in
     let* success = poll_until ~timeout ~interval:default_poll_interval ~check in
-    if success then
-      Lwt.return_unit
+    if success then Lwt.return_unit
     else
-      Error.fail_wait_timeout ~strategy:(Printf.sprintf "exec(%s)" (String.concat " " cmd)) ~timeout
+      Error.fail_wait_timeout
+        ~strategy:(Printf.sprintf "exec(%s)" (String.concat " " cmd))
+        ~timeout
   in
   make ~name:(Printf.sprintf "exec(%s)" (String.concat " " cmd)) ~strategy
   |> with_timeout timeout
@@ -198,13 +210,10 @@ let for_health_check ?(timeout = default_timeout) () =
       Lwt.return (info.state.status = "healthy" || info.state.running)
     in
     let* success = poll_until ~timeout ~interval:default_poll_interval ~check in
-    if success then
-      Lwt.return_unit
-    else
-      Error.fail_wait_timeout ~strategy:"health_check" ~timeout
+    if success then Lwt.return_unit
+    else Error.fail_wait_timeout ~strategy:"health_check" ~timeout
   in
-  make ~name:"health_check" ~strategy
-  |> with_timeout timeout
+  make ~name:"health_check" ~strategy |> with_timeout timeout
 
 (* Combinator: all strategies must pass *)
 let all strategies =
@@ -212,30 +221,33 @@ let all strategies =
     Lwt_list.iter_s (fun s -> s.strategy ctx) strategies
   in
   let names = List.map (fun s -> s.name) strategies in
-  make ~name:(Printf.sprintf "all(%s)" (String.concat ", " names)) ~strategy:combined_strategy
+  make
+    ~name:(Printf.sprintf "all(%s)" (String.concat ", " names))
+    ~strategy:combined_strategy
 
 (* Combinator: any strategy passing is sufficient *)
 let any strategies =
   let combined_strategy ctx =
-    let* results = Lwt_list.map_p (fun s ->
-      Lwt.catch
-        (fun () ->
-          let* () = s.strategy ctx in
-          Lwt.return_true)
-        (fun _ -> Lwt.return_false)
-    ) strategies in
-    if List.exists Fun.id results then
-      Lwt.return_unit
-    else
-      Error.fail_wait_timeout ~strategy:"any" ~timeout:0.0
+    let* results =
+      Lwt_list.map_p
+        (fun s ->
+          Lwt.catch
+            (fun () ->
+              let* () = s.strategy ctx in
+              Lwt.return_true)
+            (fun _ -> Lwt.return_false))
+        strategies
+    in
+    if List.exists Fun.id results then Lwt.return_unit
+    else Error.fail_wait_timeout ~strategy:"any" ~timeout:0.0
   in
   let names = List.map (fun s -> s.name) strategies in
-  make ~name:(Printf.sprintf "any(%s)" (String.concat ", " names)) ~strategy:combined_strategy
+  make
+    ~name:(Printf.sprintf "any(%s)" (String.concat ", " names))
+    ~strategy:combined_strategy
 
 (* No-op wait strategy *)
-let none =
-  make ~name:"none" ~strategy:(fun _ -> Lwt.return_unit)
+let none = make ~name:"none" ~strategy:(fun _ -> Lwt.return_unit)
 
 (* Execute wait strategy *)
-let wait ctx strategy =
-  strategy.strategy ctx
+let wait ctx strategy = strategy.strategy ctx

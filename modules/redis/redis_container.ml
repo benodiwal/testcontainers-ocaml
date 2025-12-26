@@ -6,18 +6,9 @@ open Testcontainers
 let default_image = "redis:7-alpine"
 let default_port = Port.tcp 6379
 
-type t = {
-  image : string;
-  password : string option;
-  port : Port.exposed_port;
-}
+type t = { image : string; password : string option; port : Port.exposed_port }
 
-let create () = {
-  image = default_image;
-  password = None;
-  port = default_port;
-}
-
+let create () = { image = default_image; password = None; port = default_port }
 let with_image image t = { t with image }
 let with_password password t = { t with password = Some password }
 
@@ -31,7 +22,7 @@ let to_request t =
   match t.password with
   | Some pw ->
       request
-      |> Container_request.with_cmd ["redis-server"; "--requirepass"; pw]
+      |> Container_request.with_cmd [ "redis-server"; "--requirepass"; pw ]
   | None -> request
 
 let start t =
@@ -41,21 +32,18 @@ let start t =
 let connection_uri t container =
   let* host = Container.host container in
   let* port = Container.mapped_port container t.port in
-  let uri = match t.password with
+  let uri =
+    match t.password with
     | Some pw -> Printf.sprintf "redis://:%s@%s:%d" pw host port
     | None -> Printf.sprintf "redis://%s:%d" host port
   in
   Lwt.return uri
 
 let host container = Container.host container
-
 let port t container = Container.mapped_port container t.port
 
 let with_redis ?config f =
-  let t = match config with
-    | Some cfg -> cfg (create ())
-    | None -> create ()
-  in
+  let t = match config with Some cfg -> cfg (create ()) | None -> create () in
   let* container = start t in
   let* uri = connection_uri t container in
   Lwt.finalize

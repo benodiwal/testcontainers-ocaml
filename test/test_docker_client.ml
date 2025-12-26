@@ -14,9 +14,11 @@ let test_ping _switch () =
 let test_version _switch () =
   if Test_helpers.skip_integration_tests () then Lwt.return_unit
   else begin
-    let* (version, api_version) = Docker_client.version () in
+    let* version, api_version = Docker_client.version () in
     Alcotest.(check bool) "version not empty" true (String.length version > 0);
-    Alcotest.(check bool) "api version not empty" true (String.length api_version > 0);
+    Alcotest.(check bool)
+      "api version not empty" true
+      (String.length api_version > 0);
     Lwt.return_unit
   end
 

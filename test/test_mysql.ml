@@ -9,8 +9,12 @@ let test_config _switch () =
     |> Testcontainers_mysql.Mysql_container.with_username "admin"
     |> Testcontainers_mysql.Mysql_container.with_password "secret"
   in
-  Alcotest.(check string) "database" "mydb" (Testcontainers_mysql.Mysql_container.database config);
-  Alcotest.(check string) "username" "admin" (Testcontainers_mysql.Mysql_container.username config);
+  Alcotest.(check string)
+    "database" "mydb"
+    (Testcontainers_mysql.Mysql_container.database config);
+  Alcotest.(check string)
+    "username" "admin"
+    (Testcontainers_mysql.Mysql_container.username config);
   Lwt.return_unit
 
 let test_container _switch () =
@@ -24,8 +28,12 @@ let test_container _switch () =
         |> Testcontainers_mysql.Mysql_container.with_password "testpass"
         |> Testcontainers_mysql.Mysql_container.with_root_password "rootpass")
       (fun container conn_str ->
-        Alcotest.(check bool) "connection string not empty" true (String.length conn_str > 0);
-        Alcotest.(check bool) "connection string contains mysql://" true (Test_helpers.string_starts_with ~prefix:"mysql://" conn_str);
+        Alcotest.(check bool)
+          "connection string not empty" true
+          (String.length conn_str > 0);
+        Alcotest.(check bool)
+          "connection string contains mysql://" true
+          (Test_helpers.string_starts_with ~prefix:"mysql://" conn_str);
         let* host = Testcontainers_mysql.Mysql_container.host container in
         Alcotest.(check string) "host is localhost" "127.0.0.1" host;
         Lwt.return_unit)

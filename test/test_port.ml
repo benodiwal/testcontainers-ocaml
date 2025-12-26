@@ -5,13 +5,17 @@ open Testcontainers
 let test_tcp_creation _switch () =
   let port = Port.tcp 5432 in
   Alcotest.(check int) "port number" 5432 port.port;
-  Alcotest.(check string) "protocol" "tcp" (Port.protocol_to_string port.protocol);
+  Alcotest.(check string)
+    "protocol" "tcp"
+    (Port.protocol_to_string port.protocol);
   Lwt.return_unit
 
 let test_udp_creation _switch () =
   let port = Port.udp 53 in
   Alcotest.(check int) "port number" 53 port.port;
-  Alcotest.(check string) "protocol" "udp" (Port.protocol_to_string port.protocol);
+  Alcotest.(check string)
+    "protocol" "udp"
+    (Port.protocol_to_string port.protocol);
   Lwt.return_unit
 
 let test_to_string _switch () =
@@ -23,7 +27,9 @@ let test_to_string _switch () =
 
 let test_to_docker_format _switch () =
   let port = Port.tcp 8080 in
-  Alcotest.(check string) "docker format" "8080/tcp" (Port.to_docker_format port);
+  Alcotest.(check string)
+    "docker format" "8080/tcp"
+    (Port.to_docker_format port);
   Lwt.return_unit
 
 let test_of_string _switch () =
@@ -31,11 +37,17 @@ let test_of_string _switch () =
   let port2 = Port.of_string "53/udp" in
   let port3 = Port.of_string "80" in
   Alcotest.(check int) "port1 number" 5432 port1.port;
-  Alcotest.(check string) "port1 protocol" "tcp" (Port.protocol_to_string port1.protocol);
+  Alcotest.(check string)
+    "port1 protocol" "tcp"
+    (Port.protocol_to_string port1.protocol);
   Alcotest.(check int) "port2 number" 53 port2.port;
-  Alcotest.(check string) "port2 protocol" "udp" (Port.protocol_to_string port2.protocol);
+  Alcotest.(check string)
+    "port2 protocol" "udp"
+    (Port.protocol_to_string port2.protocol);
   Alcotest.(check int) "port3 number" 80 port3.port;
-  Alcotest.(check string) "port3 protocol (default)" "tcp" (Port.protocol_to_string port3.protocol);
+  Alcotest.(check string)
+    "port3 protocol (default)" "tcp"
+    (Port.protocol_to_string port3.protocol);
   Lwt.return_unit
 
 let test_equality _switch () =

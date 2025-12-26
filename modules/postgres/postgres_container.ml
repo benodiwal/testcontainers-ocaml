@@ -18,21 +18,26 @@ type t = {
   port : Port.exposed_port;
 }
 
-let create () = {
-  image = default_image;
-  database = default_database;
-  username = default_username;
-  password = default_password;
-  init_scripts = [];
-  port = default_port;
-}
+let create () =
+  {
+    image = default_image;
+    database = default_database;
+    username = default_username;
+    password = default_password;
+    init_scripts = [];
+    port = default_port;
+  }
 
 let with_image image t = { t with image }
 let with_database database t = { t with database }
 let with_username username t = { t with username }
 let with_password password t = { t with password }
-let with_init_script script t = { t with init_scripts = script :: t.init_scripts }
-let with_init_scripts scripts t = { t with init_scripts = scripts @ t.init_scripts }
+
+let with_init_script script t =
+  { t with init_scripts = script :: t.init_scripts }
+
+let with_init_scripts scripts t =
+  { t with init_scripts = scripts @ t.init_scripts }
 
 let database t = t.database
 let username t = t.username
@@ -55,8 +60,10 @@ let start t =
 let connection_string ?(params = []) t container =
   let* host = Container.host container in
   let* port = Container.mapped_port container t.port in
-  let base = Printf.sprintf "postgresql://%s:%s@%s:%d/%s"
-    t.username t.password host port t.database in
+  let base =
+    Printf.sprintf "postgresql://%s:%s@%s:%d/%s" t.username t.password host port
+      t.database
+  in
   let params_str =
     if params = [] then ""
     else "?" ^ String.concat "&" (List.map (fun (k, v) -> k ^ "=" ^ v) params)
@@ -69,14 +76,10 @@ let jdbc_url t container =
   Lwt.return (Printf.sprintf "jdbc:postgresql://%s:%d/%s" host port t.database)
 
 let host container = Container.host container
-
 let port t container = Container.mapped_port container t.port
 
 let with_postgres ?config f =
-  let t = match config with
-    | Some cfg -> cfg (create ())
-    | None -> create ()
-  in
+  let t = match config with Some cfg -> cfg (create ()) | None -> create () in
   let* container = start t in
   let* conn_str = connection_string t container in
   Lwt.finalize

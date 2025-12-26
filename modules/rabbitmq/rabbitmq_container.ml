@@ -19,20 +19,20 @@ type t = {
   management_port : Port.exposed_port;
 }
 
-let create () = {
-  image = default_image;
-  username = default_username;
-  password = default_password;
-  vhost = default_vhost;
-  amqp_port = default_amqp_port;
-  management_port = default_management_port;
-}
+let create () =
+  {
+    image = default_image;
+    username = default_username;
+    password = default_password;
+    vhost = default_vhost;
+    amqp_port = default_amqp_port;
+    management_port = default_management_port;
+  }
 
 let with_image image t = { t with image }
 let with_username username t = { t with username }
 let with_password password t = { t with password }
 let with_vhost vhost t = { t with vhost }
-
 let username t = t.username
 let password t = t.password
 let vhost t = t.vhost
@@ -55,8 +55,9 @@ let amqp_url t container =
   let* host = Container.host container in
   let* port = Container.mapped_port container t.amqp_port in
   let vhost = if t.vhost = "/" then "" else Uri.pct_encode t.vhost in
-  Lwt.return (Printf.sprintf "amqp://%s:%s@%s:%d/%s"
-    t.username t.password host port vhost)
+  Lwt.return
+    (Printf.sprintf "amqp://%s:%s@%s:%d/%s" t.username t.password host port
+       vhost)
 
 let management_url t container =
   let* host = Container.host container in
@@ -64,16 +65,13 @@ let management_url t container =
   Lwt.return (Printf.sprintf "http://%s:%d" host port)
 
 let host container = Container.host container
-
 let amqp_port t container = Container.mapped_port container t.amqp_port
 
-let management_port t container = Container.mapped_port container t.management_port
+let management_port t container =
+  Container.mapped_port container t.management_port
 
 let with_rabbitmq ?config f =
-  let t = match config with
-    | Some cfg -> cfg (create ())
-    | None -> create ()
-  in
+  let t = match config with Some cfg -> cfg (create ()) | None -> create () in
   let* container = start t in
   let* url = amqp_url t container in
   Lwt.finalize

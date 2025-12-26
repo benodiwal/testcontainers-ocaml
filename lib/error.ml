@@ -15,10 +15,8 @@ type t =
 exception Testcontainers_error of t
 
 let to_string = function
-  | Container_not_found id ->
-      Printf.sprintf "Container not found: %s" id
-  | Container_not_running id ->
-      Printf.sprintf "Container not running: %s" id
+  | Container_not_found id -> Printf.sprintf "Container not found: %s" id
+  | Container_not_running id -> Printf.sprintf "Container not running: %s" id
   | Container_start_failed { id; message } ->
       Printf.sprintf "Failed to start container %s: %s" id message
   | Container_stop_failed { id; message } ->
@@ -29,16 +27,19 @@ let to_string = function
       Printf.sprintf "Docker API error (status %d): %s" status message
   | Docker_connection_failed msg ->
       Printf.sprintf "Failed to connect to Docker daemon: %s" msg
-  | Invalid_configuration msg ->
-      Printf.sprintf "Invalid configuration: %s" msg
+  | Invalid_configuration msg -> Printf.sprintf "Invalid configuration: %s" msg
   | Image_pull_failed { image; message } ->
       Printf.sprintf "Failed to pull image %s: %s" image message
   | Port_not_mapped { container_port; protocol } ->
       Printf.sprintf "Port %d/%s not mapped" container_port protocol
 
 let raise_error err = raise (Testcontainers_error err)
-
 let fail_container_not_found id = raise_error (Container_not_found id)
-let fail_docker_error ~status ~message = raise_error (Docker_error { status; message })
+
+let fail_docker_error ~status ~message =
+  raise_error (Docker_error { status; message })
+
 let fail_invalid_config msg = raise_error (Invalid_configuration msg)
-let fail_wait_timeout ~strategy ~timeout = raise_error (Wait_timeout { strategy; timeout })
+
+let fail_wait_timeout ~strategy ~timeout =
+  raise_error (Wait_timeout { strategy; timeout })

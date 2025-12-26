@@ -3,7 +3,9 @@
 open Testcontainers
 
 let test_to_string _switch () =
-  let err = Error.Container_start_failed { id = "abc123"; message = "test error" } in
+  let err =
+    Error.Container_start_failed { id = "abc123"; message = "test error" }
+  in
   let str = Error.to_string err in
   Alcotest.(check bool) "error string not empty" true (String.length str > 0);
   Alcotest.(check bool) "contains message" true (String.length str > 0);
