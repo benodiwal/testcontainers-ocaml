@@ -1,0 +1,6 @@
+(library
+ (name testcontainers_memcached)
+ (public_name testcontainers-memcached)
+ (libraries testcontainers lwt)
+ (preprocess
+  (pps lwt_ppx)))

@@ -1,0 +1,6 @@
+(library
+ (name testcontainers_elasticsearch)
+ (public_name testcontainers-elasticsearch)
+ (libraries testcontainers lwt)
+ (preprocess
+  (pps lwt_ppx)))

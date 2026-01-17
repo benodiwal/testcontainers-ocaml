@@ -4,13 +4,21 @@
   redis_example
   basic_example
   mysql_example
-  mongo_example)
+  mongo_example
+  kafka_example
+  elasticsearch_example
+  localstack_example
+  memcached_example)
  (libraries
   testcontainers
   testcontainers-postgres
   testcontainers-redis
   testcontainers-mysql
   testcontainers-mongo
+  testcontainers-kafka
+  testcontainers-elasticsearch
+  testcontainers-localstack
+  testcontainers-memcached
   lwt
   lwt.unix)
  (preprocess

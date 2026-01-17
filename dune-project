@@ -82,3 +82,39 @@
   (testcontainers (= :version))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
+
+(package
+ (name testcontainers-kafka)
+ (synopsis "Kafka module for testcontainers")
+ (description "Apache Kafka container module for testcontainers-ocaml")
+ (depends
+  (testcontainers (= :version))
+  (alcotest (and :with-test (>= 1.7.0)))
+  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+
+(package
+ (name testcontainers-elasticsearch)
+ (synopsis "Elasticsearch module for testcontainers")
+ (description "Elasticsearch container module for testcontainers-ocaml")
+ (depends
+  (testcontainers (= :version))
+  (alcotest (and :with-test (>= 1.7.0)))
+  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+
+(package
+ (name testcontainers-localstack)
+ (synopsis "LocalStack module for testcontainers")
+ (description "LocalStack (AWS emulation) container module for testcontainers-ocaml")
+ (depends
+  (testcontainers (= :version))
+  (alcotest (and :with-test (>= 1.7.0)))
+  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+
+(package
+ (name testcontainers-memcached)
+ (synopsis "Memcached module for testcontainers")
+ (description "Memcached container module for testcontainers-ocaml")
+ (depends
+  (testcontainers (= :version))
+  (alcotest (and :with-test (>= 1.7.0)))
+  (alcotest-lwt (and :with-test (>= 1.7.0)))))

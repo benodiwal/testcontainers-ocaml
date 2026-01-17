@@ -31,4 +31,8 @@ let () =
          ("rabbitmq", Test_rabbitmq.suite);
          ("mysql", Test_mysql.suite);
          ("mongo", Test_mongo.suite);
+         ("kafka", Test_kafka.suite);
+         ("elasticsearch", Test_elasticsearch.suite);
+         ("localstack", Test_localstack.suite);
+         ("memcached", Test_memcached.suite);
        ])

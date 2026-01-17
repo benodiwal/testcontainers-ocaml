@@ -17,7 +17,11 @@
   test_redis
   test_rabbitmq
   test_mysql
-  test_mongo)
+  test_mongo
+  test_kafka
+  test_elasticsearch
+  test_localstack
+  test_memcached)
  (libraries
   testcontainers
   testcontainers-postgres
@@ -25,6 +29,10 @@
   testcontainers-rabbitmq
   testcontainers-mysql
   testcontainers-mongo
+  testcontainers-kafka
+  testcontainers-elasticsearch
+  testcontainers-localstack
+  testcontainers-memcached
   alcotest
   alcotest-lwt
   lwt

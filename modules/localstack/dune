@@ -1,0 +1,6 @@
+(library
+ (name testcontainers_localstack)
+ (public_name testcontainers-localstack)
+ (libraries testcontainers lwt)
+ (preprocess
+  (pps lwt_ppx)))

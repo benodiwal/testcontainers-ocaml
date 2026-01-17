@@ -1,0 +1,6 @@
+(library
+ (name testcontainers_kafka)
+ (public_name testcontainers-kafka)
+ (libraries testcontainers lwt)
+ (preprocess
+  (pps lwt_ppx)))
