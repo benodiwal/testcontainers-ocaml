@@ -7,9 +7,9 @@
 (source
  (github benodiwal/testcontainers_ocaml))
 
-(authors "Sachin Beniwal <sachinbeniwal0101.com>")
+(authors "Sachin Beniwal <sachinbeniwal0101@gmail.com>")
 
-(maintainers "Sachin Beniwal <sachinbeniwal0101.com>")
+(maintainers "Sachin Beniwal <sachinbeniwal0101@gmail.com>")
 
 (license Apache-2.0)
 

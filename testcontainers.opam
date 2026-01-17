@@ -6,8 +6,8 @@ TestContainers is an OCaml library that provides lightweight, throwaway
    instances of databases, message brokers, or any service that runs in a
    Docker container. Enables reliable integration testing with real services
    instead of mocks."""
-maintainer: ["Sachin Beniwal <sachinbeniwal0101.com>"]
-authors: ["Sachin Beniwal <sachinbeniwal0101.com>"]
+maintainer: ["Sachin Beniwal <sachinbeniwal0101@gmail.com>"]
+authors: ["Sachin Beniwal <sachinbeniwal0101@gmail.com>"]
 license: "Apache-2.0"
 tags: [
   "docker" "testing" "integration-testing" "containers" "testcontainers"
