@@ -78,6 +78,13 @@ and port_binding = { host_ip : string; host_port : string }
 
 type container_state = { status : string; running : bool; exit_code : int }
 
+type network_info = {
+  network_id : string;
+  ip_address : string;
+  gateway : string;
+  aliases : string list;
+}
+
 type container_info = {
   id : string;
   name : string;
@@ -89,6 +96,7 @@ and network_settings = {
   ports : (string * port_binding list) list;
   ip_address : string;
   gateway : string;
+  networks : (string * network_info) list;
 }
 
 type create_response = { id : string; warnings : string list }
@@ -366,6 +374,37 @@ let parse_container_info body_str =
   let ports_json =
     Json.get_assoc "Ports" network_json |> Option.value ~default:(`Assoc [])
   in
+  let networks =
+    match Json.get_assoc "Networks" network_json with
+    | Some (`Assoc nets) ->
+        List.filter_map
+          (fun (net_name, net_info) ->
+            match net_info with
+            | `Assoc _ ->
+                let network_id =
+                  Json.get_string "NetworkID" net_info
+                  |> Option.value ~default:""
+                in
+                let ip =
+                  Json.get_string "IPAddress" net_info
+                  |> Option.value ~default:""
+                in
+                let gw =
+                  Json.get_string "Gateway" net_info |> Option.value ~default:""
+                in
+                let aliases =
+                  match Json.get_list "Aliases" net_info with
+                  | Some lst ->
+                      List.filter_map
+                        (function `String s -> Some s | _ -> None)
+                        lst
+                  | None -> []
+                in
+                Some (net_name, { network_id; ip_address = ip; gateway = gw; aliases })
+            | _ -> None)
+          nets
+    | _ -> []
+  in
   let network_settings =
     {
       ports = parse_port_bindings ports_json;
@@ -373,6 +412,7 @@ let parse_container_info body_str =
         Json.get_string "IPAddress" network_json |> Option.value ~default:"";
       gateway =
         Json.get_string "Gateway" network_json |> Option.value ~default:"";
+      networks;
     }
   in
   { id; name; state; network_settings }

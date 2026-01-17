@@ -118,6 +118,68 @@ let test_state _switch () =
         Lwt.return_unit)
   end
 
+let test_container_ip _switch () =
+  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  else begin
+    let request =
+      Container_request.create "alpine:latest"
+      |> Container_request.with_cmd [ "sleep"; "10" ]
+    in
+    Container.with_container request (fun container ->
+        let* ip = Container.container_ip container in
+        Alcotest.(check bool) "ip not empty" true (String.length ip > 0);
+        (* IP should be in format x.x.x.x *)
+        Alcotest.(check bool)
+          "ip contains dots" true
+          (String.contains ip '.');
+        Lwt.return_unit)
+  end
+
+let test_container_ips _switch () =
+  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  else begin
+    let request =
+      Container_request.create "alpine:latest"
+      |> Container_request.with_cmd [ "sleep"; "10" ]
+    in
+    Container.with_container request (fun container ->
+        let* ips = Container.container_ips container in
+        Alcotest.(check bool) "has at least one ip" true (List.length ips > 0);
+        let _, ip = List.hd ips in
+        Alcotest.(check bool) "ip not empty" true (String.length ip > 0);
+        Lwt.return_unit)
+  end
+
+let test_inspect _switch () =
+  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  else begin
+    let request =
+      Container_request.create "alpine:latest"
+      |> Container_request.with_cmd [ "sleep"; "10" ]
+    in
+    Container.with_container request (fun container ->
+        let* info = Container.inspect container in
+        Alcotest.(check bool)
+          "id matches" true
+          (info.id = Container.id container);
+        Alcotest.(check bool) "name not empty" true (String.length info.name > 0);
+        Alcotest.(check bool) "is running" true info.state.running;
+        Lwt.return_unit)
+  end
+
+let test_gateway _switch () =
+  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  else begin
+    let request =
+      Container_request.create "alpine:latest"
+      |> Container_request.with_cmd [ "sleep"; "10" ]
+    in
+    Container.with_container request (fun container ->
+        let* gw = Container.gateway container in
+        Alcotest.(check bool) "gateway not empty" true (String.length gw > 0);
+        Lwt.return_unit)
+  end
+
 let suite =
   [
     Alcotest_lwt.test_case "start and stop" `Slow test_start_stop;
@@ -127,4 +189,8 @@ let suite =
     Alcotest_lwt.test_case "exec" `Slow test_exec;
     Alcotest_lwt.test_case "logs" `Slow test_logs;
     Alcotest_lwt.test_case "state" `Slow test_state;
+    Alcotest_lwt.test_case "container_ip" `Slow test_container_ip;
+    Alcotest_lwt.test_case "container_ips" `Slow test_container_ips;
+    Alcotest_lwt.test_case "inspect" `Slow test_inspect;
+    Alcotest_lwt.test_case "gateway" `Slow test_gateway;
   ]

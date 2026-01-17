@@ -9,8 +9,49 @@ type t = {
 }
 
 let id t = t.id
-let name t = match t.info with Some info -> info.name | None -> ""
+
+let name t =
+  match t.info with Some info -> info.Docker_client.name | None -> ""
+
 let host _t = Lwt.return "127.0.0.1"
+
+let container_ip t =
+  let* info = Docker_client.inspect_container t.id in
+  t.info <- Some info;
+  Lwt.return info.network_settings.ip_address
+
+let container_ips t =
+  let* info = Docker_client.inspect_container t.id in
+  t.info <- Some info;
+  let ips =
+    List.filter_map
+      (fun (net_name, (net_info : Docker_client.network_info)) ->
+        let ip = net_info.ip_address in
+        if ip <> "" then Some (net_name, ip) else None)
+      info.network_settings.networks
+  in
+  Lwt.return ips
+
+let network_aliases t =
+  let* info = Docker_client.inspect_container t.id in
+  t.info <- Some info;
+  let aliases =
+    List.concat_map
+      (fun (net_name, (net_info : Docker_client.network_info)) ->
+        List.map (fun alias -> (net_name, alias)) net_info.aliases)
+      info.network_settings.networks
+  in
+  Lwt.return aliases
+
+let gateway t =
+  let* info = Docker_client.inspect_container t.id in
+  t.info <- Some info;
+  Lwt.return info.network_settings.gateway
+
+let inspect t =
+  let* info = Docker_client.inspect_container t.id in
+  t.info <- Some info;
+  Lwt.return info
 
 let refresh_info t =
   let* info = Docker_client.inspect_container t.id in
