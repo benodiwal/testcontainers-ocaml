@@ -14,10 +14,18 @@ type t = {
 }
 
 let create () =
-  { image = default_image; port = default_port; password = None; security_enabled = false }
+  {
+    image = default_image;
+    port = default_port;
+    password = None;
+    security_enabled = false;
+  }
 
 let with_image image t = { t with image }
-let with_password password t = { t with password = Some password; security_enabled = true }
+
+let with_password password t =
+  { t with password = Some password; security_enabled = true }
+
 let with_security_enabled enabled t = { t with security_enabled = enabled }
 
 let to_request t =

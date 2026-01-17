@@ -6,11 +6,7 @@ open Testcontainers
 let default_image = "memcached:1.6-alpine"
 let default_port = Port.tcp 11211
 
-type t = {
-  image : string;
-  port : Port.exposed_port;
-  memory_mb : int;
-}
+type t = { image : string; port : Port.exposed_port; memory_mb : int }
 
 let create () = { image = default_image; port = default_port; memory_mb = 64 }
 let with_image image t = { t with image }

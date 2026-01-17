@@ -9,7 +9,9 @@ let test_config _switch () =
     Localstack_container.with_services [ "s3"; "sqs"; "dynamodb" ] config
   in
   let config = Localstack_container.with_region "eu-west-1" config in
-  Alcotest.(check string) "region" "eu-west-1" (Localstack_container.region config);
+  Alcotest.(check string)
+    "region" "eu-west-1"
+    (Localstack_container.region config);
   Lwt.return_unit
 
 let test_container _switch () =

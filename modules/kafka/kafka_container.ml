@@ -6,13 +6,11 @@ open Testcontainers
 let default_image = "confluentinc/cp-kafka:7.5.0"
 let default_port = Port.tcp 9092
 
-type t = {
-  image : string;
-  port : Port.exposed_port;
-  kraft_mode : bool;
-}
+type t = { image : string; port : Port.exposed_port; kraft_mode : bool }
 
-let create () = { image = default_image; port = default_port; kraft_mode = true }
+let create () =
+  { image = default_image; port = default_port; kraft_mode = true }
+
 let with_image image t = { t with image }
 let with_kraft_mode kraft_mode t = { t with kraft_mode }
 
