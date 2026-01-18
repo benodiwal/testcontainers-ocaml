@@ -129,9 +129,7 @@ let test_container_ip _switch () =
         let* ip = Container.container_ip container in
         Alcotest.(check bool) "ip not empty" true (String.length ip > 0);
         (* IP should be in format x.x.x.x *)
-        Alcotest.(check bool)
-          "ip contains dots" true
-          (String.contains ip '.');
+        Alcotest.(check bool) "ip contains dots" true (String.contains ip '.');
         Lwt.return_unit)
   end
 
@@ -180,6 +178,69 @@ let test_gateway _switch () =
         Lwt.return_unit)
   end
 
+let test_copy_dir_to _switch () =
+  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  else begin
+    let request =
+      Container_request.create "alpine:latest"
+      |> Container_request.with_cmd [ "sleep"; "30" ]
+    in
+    Container.with_container request (fun container ->
+        (* Use copy_content_to to create a directory structure inside container *)
+        let* _ = Container.exec container [ "mkdir"; "-p"; "/data/testdir" ] in
+        let* () =
+          Container.copy_content_to container ~content:"hello from dir test"
+            ~dest:"/data/testdir/test.txt"
+        in
+        (* Verify the file exists *)
+        let* exit_code, output =
+          Container.exec container [ "cat"; "/data/testdir/test.txt" ]
+        in
+        Alcotest.(check int) "cat exit code" 0 exit_code;
+        Alcotest.(check bool) "output not empty" true (String.length output > 0);
+        Lwt.return_unit)
+  end
+
+let test_follow_logs _switch () =
+  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  else begin
+    let request =
+      Container_request.create "alpine:latest"
+      |> Container_request.with_cmd
+           [
+             "sh";
+             "-c";
+             "for i in 1 2 3; do echo \"log line $i\"; sleep 0.2; done";
+           ]
+    in
+    let* container = Container.start request in
+    let log_buffer = Buffer.create 256 in
+    (* Use a timeout to avoid waiting forever *)
+    let log_stream =
+      Lwt.catch
+        (fun () ->
+          Container.follow_logs ~tail:"10"
+            ~on_log:(fun chunk ->
+              Buffer.add_string log_buffer chunk;
+              Lwt.return_unit)
+            container)
+        (fun _ -> Lwt.return_unit)
+    in
+    (* Wait for container to finish or timeout *)
+    let* () =
+      Lwt.pick
+        [
+          log_stream;
+          (let* () = Lwt_unix.sleep 5.0 in
+           Lwt.return_unit);
+        ]
+    in
+    let logs = Buffer.contents log_buffer in
+    Alcotest.(check bool) "received some logs" true (String.length logs > 0);
+    let* () = Container.terminate container in
+    Lwt.return_unit
+  end
+
 let suite =
   [
     Alcotest_lwt.test_case "start and stop" `Slow test_start_stop;
@@ -193,4 +254,6 @@ let suite =
     Alcotest_lwt.test_case "container_ips" `Slow test_container_ips;
     Alcotest_lwt.test_case "inspect" `Slow test_inspect;
     Alcotest_lwt.test_case "gateway" `Slow test_gateway;
+    Alcotest_lwt.test_case "copy_dir_to" `Slow test_copy_dir_to;
+    Alcotest_lwt.test_case "follow_logs" `Slow test_follow_logs;
   ]

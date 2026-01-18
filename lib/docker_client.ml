@@ -400,7 +400,9 @@ let parse_container_info body_str =
                         lst
                   | None -> []
                 in
-                Some (net_name, { network_id; ip_address = ip; gateway = gw; aliases })
+                Some
+                  ( net_name,
+                    { network_id; ip_address = ip; gateway = gw; aliases } )
             | _ -> None)
           nets
     | _ -> []
@@ -455,6 +457,52 @@ let container_logs ?(stdout = true) ?(stderr = true) ?(follow = false)
   in
   let* resp = make_request `GET path () in
   handle_response resp
+
+(* Stream logs with a callback - calls on_log for each chunk of logs *)
+let stream_logs ?(stdout = true) ?(stderr = true) ?(tail = "all") ~on_log id =
+  let path =
+    Printf.sprintf "/containers/%s/logs?stdout=%b&stderr=%b&follow=true&tail=%s"
+      id stdout stderr tail
+  in
+  let* sock = connect_to_docker () in
+  let full_path = Printf.sprintf "/%s%s" api_version path in
+  let request =
+    Printf.sprintf
+      "GET %s HTTP/1.1\r\nHost: localhost\r\nConnection: keep-alive\r\n\r\n"
+      full_path
+  in
+  let ic =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock
+  in
+  let oc =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock
+  in
+  let* () = Lwt_io.write oc request in
+  let* () = Lwt_io.flush oc in
+  (* Skip HTTP headers *)
+  let rec skip_headers () =
+    let* line = Lwt_io.read_line ic in
+    if String.trim line = "" then Lwt.return_unit else skip_headers ()
+  in
+  let* () = skip_headers () in
+  (* Read and process log chunks *)
+  let buf = Bytes.create 4096 in
+  let rec read_loop () =
+    Lwt.catch
+      (fun () ->
+        let* n = Lwt_io.read_into ic buf 0 4096 in
+        if n = 0 then Lwt.return_unit
+        else begin
+          let chunk = Bytes.sub_string buf 0 n in
+          let* () = on_log chunk in
+          read_loop ()
+        end)
+      (fun _ -> Lwt.return_unit)
+  in
+  let* () = read_loop () in
+  let* () = Lwt_io.close oc in
+  let* () = Lwt_io.close ic in
+  Lwt_unix.close sock
 
 let wait_container id =
   let path = Printf.sprintf "/containers/%s/wait" id in

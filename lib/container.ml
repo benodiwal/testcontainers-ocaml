@@ -139,6 +139,9 @@ let state t =
 let logs ?since:_ ?(follow = false) t =
   Docker_client.container_logs ~follow t.id
 
+let follow_logs ?(stdout = true) ?(stderr = true) ?(tail = "all") ~on_log t =
+  Docker_client.stream_logs ~stdout ~stderr ~tail ~on_log t.id
+
 let exec t cmd =
   let* exec_id = Docker_client.exec_create t.id cmd in
   let* output = Docker_client.exec_start exec_id in
@@ -266,3 +269,19 @@ let copy_content_to t ~content ~dest =
   let dest_dir = Filename.dirname dest in
   let* tar_data = create_tar_from_content ~filename ~content in
   Docker_client.put_archive t.id ~path:dest_dir ~data:tar_data
+
+(* Create a tar archive from a directory *)
+let create_tar_from_dir ~src =
+  let dir_name = Filename.basename src in
+  let parent_dir = Filename.dirname src in
+  let cmd =
+    Lwt_process.shell
+      (Printf.sprintf "COPYFILE_DISABLE=1 tar -c -C %s %s"
+         (Filename.quote parent_dir)
+         (Filename.quote dir_name))
+  in
+  Lwt_process.pread cmd
+
+let copy_dir_to t ~src ~dest =
+  let* tar_data = create_tar_from_dir ~src in
+  Docker_client.put_archive t.id ~path:dest ~data:tar_data
