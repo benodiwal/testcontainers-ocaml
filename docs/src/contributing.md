@@ -47,7 +47,12 @@ testcontainers-ocaml/
 │   ├── mysql/
 │   ├── mongo/
 │   ├── redis/
-│   └── rabbitmq/
+│   ├── rabbitmq/
+│   ├── kafka/
+│   ├── elasticsearch/
+│   ├── localstack/
+│   ├── memcached/
+│   └── mockserver/
 ├── test/                   # Test suite
 ├── examples/               # Example code
 └── docs/                   # Documentation (mdbook)

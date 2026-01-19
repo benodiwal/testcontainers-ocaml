@@ -22,6 +22,44 @@ let () = Lwt_main.run (
 )
 ```
 
+## Running Examples
+
+```bash
+# Clone the repository
+git clone https://github.com/benodiwal/testcontainers_ocaml.git
+cd testcontainers_ocaml
+
+# Install dependencies
+opam install . --deps-only
+
+# Run examples
+dune exec examples/basic_example.exe
+dune exec examples/postgres_example.exe
+dune exec examples/redis_example.exe
+dune exec examples/mysql_example.exe
+dune exec examples/mongo_example.exe
+dune exec examples/kafka_example.exe
+dune exec examples/elasticsearch_example.exe
+dune exec examples/localstack_example.exe
+dune exec examples/memcached_example.exe
+dune exec examples/mockserver_example.exe
+```
+
+## Available Modules
+
+| Module | Package | Description |
+|--------|---------|-------------|
+| PostgreSQL | `testcontainers-postgres` | PostgreSQL database |
+| MySQL | `testcontainers-mysql` | MySQL database |
+| MongoDB | `testcontainers-mongo` | MongoDB database |
+| Redis | `testcontainers-redis` | Redis cache |
+| RabbitMQ | `testcontainers-rabbitmq` | RabbitMQ message broker |
+| Kafka | `testcontainers-kafka` | Apache Kafka (KRaft) |
+| Elasticsearch | `testcontainers-elasticsearch` | Elasticsearch |
+| LocalStack | `testcontainers-localstack` | AWS services emulation |
+| Memcached | `testcontainers-memcached` | Memcached cache |
+| MockServer | `testcontainers-mockserver` | HTTP mocking |
+
 ## Documentation
 
 Full documentation: [https://benodiwal.github.io/testcontainers-ocaml](https://benodiwal.github.io/testcontainers-ocaml)
@@ -34,6 +72,10 @@ Full documentation: [https://benodiwal.github.io/testcontainers-ocaml](https://b
 
 - OCaml >= 5.0
 - Docker
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
