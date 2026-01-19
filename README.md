@@ -2,6 +2,8 @@
 
 Lightweight, throwaway instances of databases, message brokers, or any service that runs in a Docker container. Enables reliable integration testing with real services instead of mocks.
 
+> **Note:** This package is not yet published to opam. For now, install from source (see [Contributing](CONTRIBUTING.md#development-setup)).
+
 ## Installation
 
 ```bash
