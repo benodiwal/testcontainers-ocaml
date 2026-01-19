@@ -1,0 +1,119 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5.2"
+
+      - name: Install dependencies
+        run: opam install . --deps-only --with-test
+
+      - name: Build
+        run: opam exec -- dune build
+
+      - name: Run tests
+        run: opam exec -- dune runtest
+        env:
+          CONTAINER_TIMEOUT: "120"
+
+      - name: Check formatting
+        run: |
+          opam install ocamlformat.0.28.1
+          opam exec -- dune build @fmt
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          # Extract the changelog section for this version
+          VERSION=${{ steps.get_version.outputs.VERSION }}
+
+          # Read CHANGES.md and extract relevant section
+          if [ -f CHANGES.md ]; then
+            CHANGELOG=$(sed -n "/^## ${VERSION}/,/^## /p" CHANGES.md | sed '$d' || cat CHANGES.md)
+          else
+            CHANGELOG="Release ${VERSION}"
+          fi
+
+          # Save to file for multiline support
+          echo "$CHANGELOG" > /tmp/changelog.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ steps.get_version.outputs.VERSION }}
+          body_path: /tmp/changelog.txt
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  opam-publish:
+    name: Publish to opam
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: "5.2"
+
+      - name: Install opam-publish
+        run: opam install opam-publish
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Generate opam files
+        run: opam exec -- dune build @install
+
+      - name: Create release tarball URL
+        id: tarball
+        run: |
+          REPO=${{ github.repository }}
+          TAG=${{ github.ref_name }}
+          echo "URL=https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Instructions for opam submission
+        run: |
+          echo "=============================================="
+          echo "To submit to opam-repository, run locally:"
+          echo ""
+          echo "opam publish --tag=${{ github.ref_name }} https://github.com/${{ github.repository }}"
+          echo ""
+          echo "Or manually create a PR to opam-repository with:"
+          echo "  - Package: testcontainers"
+          echo "  - Version: ${{ steps.get_version.outputs.VERSION }}"
+          echo "  - URL: ${{ steps.tarball.outputs.URL }}"
+          echo "=============================================="
