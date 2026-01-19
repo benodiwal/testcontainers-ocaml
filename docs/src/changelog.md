@@ -42,7 +42,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `testcontainers-mongo` - MongoDB
   - `testcontainers-redis` - Redis
   - `testcontainers-rabbitmq` - RabbitMQ
-- Comprehensive test suite (69 tests)
+  - `testcontainers-kafka` - Apache Kafka (KRaft mode)
+  - `testcontainers-elasticsearch` - Elasticsearch
+  - `testcontainers-localstack` - LocalStack (AWS emulation)
+  - `testcontainers-memcached` - Memcached
+  - `testcontainers-mockserver` - MockServer (HTTP mocking)
+- Container inspection features
+  - `Container.container_ip` - Get container IP address
+  - `Container.container_ips` - Get all container IPs (multi-network)
+  - `Container.network_aliases` - Get network aliases
+  - `Container.gateway` - Get gateway address
+  - `Container.inspect` - Full container inspection
+- Log streaming
+  - `Container.follow_logs` - Stream logs with callback
+- Directory copy
+  - `Container.copy_dir_to` - Copy directory to container
+- Comprehensive test suite (85 tests)
 - Documentation with mdbook
 
 ### Technical Details
@@ -58,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First stable release with:
 - All core features
-- Five database/service modules
+- Ten database/service modules
 - Complete documentation
 - CI/CD integration examples
 

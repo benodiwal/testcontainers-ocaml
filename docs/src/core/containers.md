@@ -120,7 +120,48 @@ let* (exit_code, output) = Container.exec container [
 let* logs = Container.logs container in
 print_endline logs;
 
+(* Stream logs with callback *)
+let* () = Container.follow_logs
+  ~on_log:(fun chunk -> Printf.printf "%s" chunk; Lwt.return_unit)
+  container
+in
+
 (* Logs are useful for debugging test failures *)
+```
+
+### Container Networking Info
+
+```ocaml
+(* Get container's IP address *)
+let* ip = Container.container_ip container in
+Printf.printf "Container IP: %s\n" ip;
+
+(* Get all IPs (when connected to multiple networks) *)
+let* ips = Container.container_ips container in
+List.iter (fun (network, ip) ->
+  Printf.printf "Network %s: %s\n" network ip
+) ips;
+
+(* Get network aliases *)
+let* aliases = Container.network_aliases container in
+List.iter (fun (network, alias) ->
+  Printf.printf "Alias on %s: %s\n" network alias
+) aliases;
+
+(* Get gateway address *)
+let* gateway = Container.gateway container in
+Printf.printf "Gateway: %s\n" gateway;
+```
+
+### Full Container Inspection
+
+```ocaml
+(* Get complete container info *)
+let* info = Container.inspect container in
+Printf.printf "Container ID: %s\n" info.id;
+Printf.printf "Name: %s\n" info.name;
+Printf.printf "Running: %b\n" info.state.running;
+Printf.printf "IP Address: %s\n" info.network_settings.ip_address;
 ```
 
 ### Checking State

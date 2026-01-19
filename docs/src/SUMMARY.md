@@ -23,6 +23,11 @@
 - [MongoDB](./modules/mongodb.md)
 - [Redis](./modules/redis.md)
 - [RabbitMQ](./modules/rabbitmq.md)
+- [Kafka](./modules/kafka.md)
+- [Elasticsearch](./modules/elasticsearch.md)
+- [LocalStack](./modules/localstack.md)
+- [Memcached](./modules/memcached.md)
+- [MockServer](./modules/mockserver.md)
 
 # Advanced
 

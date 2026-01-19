@@ -24,3 +24,4 @@ Initial release.
 - `testcontainers-elasticsearch` - Elasticsearch
 - `testcontainers-localstack` - LocalStack (AWS emulation)
 - `testcontainers-memcached` - Memcached
+- `testcontainers-mockserver` - MockServer (HTTP mocking)

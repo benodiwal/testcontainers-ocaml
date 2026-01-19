@@ -108,6 +108,40 @@ let test_with_seed_data () =
   )
 ```
 
+## Copying Directories to Container
+
+Copy an entire directory from the host to the container:
+
+```ocaml
+let copy_test_fixtures container =
+  Container.copy_dir_to container
+    ~src:"/path/to/local/fixtures"
+    ~dest:"/app"
+```
+
+The directory is copied with its contents. If `src` is `/path/to/fixtures`, the contents will appear at `/app/fixtures/` in the container.
+
+### Example: Multi-file Configuration
+
+```ocaml
+let setup_app_config () =
+  let request =
+    Container_request.create "my-app:latest"
+    |> Container_request.with_exposed_port (Port.tcp 8080)
+  in
+
+  Container.with_container request (fun container ->
+    (* Copy entire config directory *)
+    let* () = Container.copy_dir_to container
+      ~src:"./config"
+      ~dest:"/app"
+    in
+
+    (* Now /app/config/ contains all files from ./config *)
+    Lwt.return_unit
+  )
+```
+
 ## Copying Files from Container
 
 Extract files from a running container:
