@@ -44,6 +44,7 @@
  (description "PostgreSQL container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -53,6 +54,7 @@
  (description "Redis container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -62,6 +64,7 @@
  (description "RabbitMQ container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -71,6 +74,7 @@
  (description "MySQL container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -80,6 +84,7 @@
  (description "MongoDB container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -89,6 +94,7 @@
  (description "Apache Kafka container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -98,6 +104,7 @@
  (description "Elasticsearch container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -107,6 +114,7 @@
  (description "LocalStack (AWS emulation) container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -116,6 +124,7 @@
  (description "Memcached container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
 
@@ -125,5 +134,6 @@
  (description "MockServer container module for mocking HTTP services in testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
+  (lwt_ppx (>= 2.1.0))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
