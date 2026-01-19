@@ -1,0 +1,4 @@
+(library
+ (name testcontainers_mockserver)
+ (public_name testcontainers-mockserver)
+ (libraries testcontainers lwt lwt.unix))

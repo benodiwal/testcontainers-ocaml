@@ -21,7 +21,8 @@
   test_kafka
   test_elasticsearch
   test_localstack
-  test_memcached)
+  test_memcached
+  test_mockserver)
  (libraries
   testcontainers
   testcontainers-postgres
@@ -33,6 +34,7 @@
   testcontainers-elasticsearch
   testcontainers-localstack
   testcontainers-memcached
+  testcontainers-mockserver
   alcotest
   alcotest-lwt
   lwt

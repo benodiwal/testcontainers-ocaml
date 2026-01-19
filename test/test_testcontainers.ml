@@ -35,4 +35,5 @@ let () =
          ("elasticsearch", Test_elasticsearch.suite);
          ("localstack", Test_localstack.suite);
          ("memcached", Test_memcached.suite);
+         ("mockserver", Test_mockserver.suite);
        ])

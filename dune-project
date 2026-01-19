@@ -118,3 +118,12 @@
   (testcontainers (= :version))
   (alcotest (and :with-test (>= 1.7.0)))
   (alcotest-lwt (and :with-test (>= 1.7.0)))))
+
+(package
+ (name testcontainers-mockserver)
+ (synopsis "MockServer module for testcontainers")
+ (description "MockServer container module for mocking HTTP services in testcontainers-ocaml")
+ (depends
+  (testcontainers (= :version))
+  (alcotest (and :with-test (>= 1.7.0)))
+  (alcotest-lwt (and :with-test (>= 1.7.0)))))

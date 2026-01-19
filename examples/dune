@@ -8,7 +8,8 @@
   kafka_example
   elasticsearch_example
   localstack_example
-  memcached_example)
+  memcached_example
+  mockserver_example)
  (libraries
   testcontainers
   testcontainers-postgres
@@ -19,6 +20,7 @@
   testcontainers-elasticsearch
   testcontainers-localstack
   testcontainers-memcached
+  testcontainers-mockserver
   lwt
   lwt.unix)
  (preprocess
