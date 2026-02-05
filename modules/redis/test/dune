@@ -1,0 +1,7 @@
+(test
+ (name test_redis_runner)
+ (package testcontainers-redis)
+ (modules test_redis_runner test_redis)
+ (libraries testcontainers-redis alcotest alcotest-lwt lwt lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))

@@ -3,8 +3,13 @@
 open Lwt.Syntax
 open Testcontainers
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
 let test_start_stop _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -22,7 +27,7 @@ let test_start_stop _switch () =
   end
 
 let test_with_container _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -45,7 +50,7 @@ let test_with_container _switch () =
   end
 
 let test_host _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -58,7 +63,7 @@ let test_host _switch () =
   end
 
 let test_mapped_port _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "nginx:alpine"
@@ -74,7 +79,7 @@ let test_mapped_port _switch () =
   end
 
 let test_exec _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -90,7 +95,7 @@ let test_exec _switch () =
   end
 
 let test_logs _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -106,7 +111,7 @@ let test_logs _switch () =
   end
 
 let test_state _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -119,7 +124,7 @@ let test_state _switch () =
   end
 
 let test_container_ip _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -134,7 +139,7 @@ let test_container_ip _switch () =
   end
 
 let test_container_ips _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -149,7 +154,7 @@ let test_container_ips _switch () =
   end
 
 let test_inspect _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -166,7 +171,7 @@ let test_inspect _switch () =
   end
 
 let test_gateway _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -179,7 +184,7 @@ let test_gateway _switch () =
   end
 
 let test_copy_dir_to _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -202,7 +207,7 @@ let test_copy_dir_to _switch () =
   end
 
 let test_follow_logs _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"

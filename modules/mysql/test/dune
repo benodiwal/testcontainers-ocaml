@@ -1,0 +1,7 @@
+(test
+ (name test_mysql_runner)
+ (package testcontainers-mysql)
+ (modules test_mysql_runner test_mysql)
+ (libraries testcontainers-mysql alcotest alcotest-lwt lwt lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))

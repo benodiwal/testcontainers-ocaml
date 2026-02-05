@@ -1,4 +1,4 @@
-(** Main test runner for testcontainers-ocaml
+(** Main test runner for testcontainers-ocaml core library
 
     Combines all test suites from individual test modules.
 
@@ -25,15 +25,4 @@ let () =
          ("network", Test_network.suite);
          (* Integration Tests - Wait Strategies *)
          ("wait_strategy_integration", Test_wait_strategy_integration.suite);
-         (* Integration Tests - Modules *)
-         ("postgres", Test_postgres.suite);
-         ("redis", Test_redis.suite);
-         ("rabbitmq", Test_rabbitmq.suite);
-         ("mysql", Test_mysql.suite);
-         ("mongo", Test_mongo.suite);
-         ("kafka", Test_kafka.suite);
-         ("elasticsearch", Test_elasticsearch.suite);
-         ("localstack", Test_localstack.suite);
-         ("memcached", Test_memcached.suite);
-         ("mockserver", Test_mockserver.suite);
        ])

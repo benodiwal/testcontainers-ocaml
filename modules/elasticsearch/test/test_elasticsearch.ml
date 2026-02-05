@@ -3,6 +3,11 @@
 open Lwt.Syntax
 open Testcontainers_elasticsearch
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
 let test_config _switch () =
   let config = Elasticsearch_container.create () in
   let config = Elasticsearch_container.with_security_enabled false config in
@@ -10,7 +15,7 @@ let test_config _switch () =
   Lwt.return_unit
 
 let test_container _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     Elasticsearch_container.with_elasticsearch (fun container url ->
         Alcotest.(check bool) "url not empty" true (String.length url > 0);

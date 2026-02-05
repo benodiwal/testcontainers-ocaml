@@ -3,8 +3,13 @@
 open Lwt.Syntax
 open Testcontainers
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
 let test_create_remove _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let* network = Network.create "test-network" in
     Alcotest.(check bool)
@@ -16,7 +21,7 @@ let test_create_remove _switch () =
   end
 
 let test_with_network _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let* () =
       Network.with_network "test-net-2" (fun network ->

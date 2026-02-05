@@ -1,3 +1,10 @@
+## 0.1.1 (2026-02-05)
+
+### Fixed
+
+- Corrected repository URLs in package metadata (testcontainers_ocaml → testcontainers-ocaml)
+- Split tests per package to fix OPAM CI test failures (each module now has isolated tests)
+
 ## 0.1.0 (2026-01-17)
 
 Initial release.

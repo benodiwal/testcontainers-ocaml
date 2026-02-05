@@ -1,0 +1,7 @@
+(test
+ (name test_mockserver_runner)
+ (package testcontainers-mockserver)
+ (modules test_mockserver_runner test_mockserver)
+ (libraries testcontainers-mockserver alcotest alcotest-lwt lwt lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))

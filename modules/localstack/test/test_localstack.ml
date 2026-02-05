@@ -3,6 +3,11 @@
 open Lwt.Syntax
 open Testcontainers_localstack
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
 let test_config _switch () =
   let config = Localstack_container.create () in
   let config =
@@ -15,7 +20,7 @@ let test_config _switch () =
   Lwt.return_unit
 
 let test_container _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     Localstack_container.with_localstack
       ~config:(fun c -> Localstack_container.with_services [ "s3" ] c)

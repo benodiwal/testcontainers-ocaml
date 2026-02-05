@@ -2,6 +2,15 @@
 
 open Lwt.Syntax
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
+let string_starts_with ~prefix s =
+  let plen = String.length prefix in
+  String.length s >= plen && String.sub s 0 plen = prefix
+
 let test_config _switch () =
   let config =
     Testcontainers_mysql.Mysql_container.create ()
@@ -18,7 +27,7 @@ let test_config _switch () =
   Lwt.return_unit
 
 let test_container _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     Testcontainers_mysql.Mysql_container.with_mysql
       ~config:(fun c ->
@@ -33,7 +42,7 @@ let test_container _switch () =
           (String.length conn_str > 0);
         Alcotest.(check bool)
           "connection string contains mysql://" true
-          (Test_helpers.string_starts_with ~prefix:"mysql://" conn_str);
+          (string_starts_with ~prefix:"mysql://" conn_str);
         let* host = Testcontainers_mysql.Mysql_container.host container in
         Alcotest.(check string) "host is localhost" "127.0.0.1" host;
         Lwt.return_unit)

@@ -2,12 +2,12 @@
 
 (name testcontainers)
 
-(version 0.1.0)
+(version 0.1.1)
 
 (generate_opam_files true)
 
 (source
- (github benodiwal/testcontainers_ocaml))
+ (github benodiwal/testcontainers-ocaml))
 
 (authors "Sachin Beniwal <sachinbeniwal0101@gmail.com>")
 
@@ -15,7 +15,7 @@
 
 (license Apache-2.0)
 
-(documentation https://benodiwal.github.io/testcontainers_ocaml)
+(documentation https://benodiwal.github.io/testcontainers-ocaml)
 
 (package
  (name testcontainers)

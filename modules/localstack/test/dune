@@ -1,0 +1,7 @@
+(test
+ (name test_localstack_runner)
+ (package testcontainers-localstack)
+ (modules test_localstack_runner test_localstack)
+ (libraries testcontainers-localstack alcotest alcotest-lwt lwt lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))

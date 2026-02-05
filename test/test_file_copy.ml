@@ -3,8 +3,13 @@
 open Lwt.Syntax
 open Testcontainers
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
 let test_copy_content_to_container _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -24,7 +29,7 @@ let test_copy_content_to_container _switch () =
   end
 
 let test_copy_file_to_container _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"

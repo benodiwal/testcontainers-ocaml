@@ -3,8 +3,13 @@
 open Lwt.Syntax
 open Testcontainers
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
 let test_wait_for_port _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "nginx:alpine"
@@ -19,7 +24,7 @@ let test_wait_for_port _switch () =
   end
 
 let test_wait_for_log _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "alpine:latest"
@@ -33,7 +38,7 @@ let test_wait_for_log _switch () =
   end
 
 let test_wait_for_http _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let request =
       Container_request.create "nginx:alpine"

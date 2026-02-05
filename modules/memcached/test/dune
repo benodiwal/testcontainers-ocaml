@@ -1,0 +1,7 @@
+(test
+ (name test_memcached_runner)
+ (package testcontainers-memcached)
+ (modules test_memcached_runner test_memcached)
+ (libraries testcontainers-memcached alcotest alcotest-lwt lwt lwt.unix)
+ (preprocess
+  (pps lwt_ppx)))

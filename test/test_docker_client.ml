@@ -3,8 +3,13 @@
 open Lwt.Syntax
 open Testcontainers
 
+let skip_integration_tests () =
+  match Sys.getenv_opt "SKIP_INTEGRATION_TESTS" with
+  | Some "1" | Some "true" -> true
+  | _ -> false
+
 let test_ping _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let* result = Docker_client.ping () in
     Alcotest.(check bool) "docker ping" true result;
@@ -12,7 +17,7 @@ let test_ping _switch () =
   end
 
 let test_version _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let* version, api_version = Docker_client.version () in
     Alcotest.(check bool) "version not empty" true (String.length version > 0);
@@ -23,7 +28,7 @@ let test_version _switch () =
   end
 
 let test_image_exists _switch () =
-  if Test_helpers.skip_integration_tests () then Lwt.return_unit
+  if skip_integration_tests () then Lwt.return_unit
   else begin
     let* exists = Docker_client.image_exists "alpine:latest" in
     (* May or may not exist, just check it doesn't crash *)
