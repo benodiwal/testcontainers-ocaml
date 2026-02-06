@@ -1,7 +1,0 @@
-(test
- (name test_mongo_runner)
- (package testcontainers-mongo)
- (modules test_mongo_runner test_mongo)
- (libraries testcontainers-mongo alcotest alcotest-lwt lwt lwt.unix)
- (preprocess
-  (pps lwt_ppx)))
