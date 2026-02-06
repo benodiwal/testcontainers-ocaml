@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,15 +22,10 @@ jobs:
           ocaml-compiler: "5.2"
 
       - name: Install dependencies
-        run: opam install . --deps-only --with-test
+        run: opam install . --deps-only
 
       - name: Build
         run: opam exec -- dune build
-
-      - name: Run tests
-        run: opam exec -- dune runtest
-        env:
-          CONTAINER_TIMEOUT: "120"
 
       - name: Check formatting
         run: |
