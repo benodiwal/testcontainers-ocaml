@@ -1,7 +1,0 @@
-(test
- (name test_kafka_runner)
- (package testcontainers-kafka)
- (modules test_kafka_runner test_kafka)
- (libraries testcontainers-kafka alcotest alcotest-lwt lwt lwt.unix)
- (preprocess
-  (pps lwt_ppx)))

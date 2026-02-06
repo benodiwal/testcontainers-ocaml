@@ -14,8 +14,6 @@ depends: [
   "dune" {>= "3.20"}
   "testcontainers" {= version}
   "lwt_ppx" {>= "2.1.0"}
-  "alcotest" {with-test & >= "1.7.0"}
-  "alcotest-lwt" {with-test & >= "1.7.0"}
   "odoc" {with-doc}
 ]
 build: [

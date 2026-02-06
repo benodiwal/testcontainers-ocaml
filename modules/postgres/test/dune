@@ -1,7 +1,0 @@
-(test
- (name test_postgres_runner)
- (package testcontainers-postgres)
- (modules test_postgres_runner test_postgres)
- (libraries testcontainers-postgres alcotest alcotest-lwt lwt lwt.unix)
- (preprocess
-  (pps lwt_ppx)))

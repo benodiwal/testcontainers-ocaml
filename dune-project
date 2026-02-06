@@ -34,9 +34,7 @@
   (re (>= 1.11.0))
   (uri (>= 4.0))
   (logs (>= 0.7.0))
-  (fmt (>= 0.9.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0))))
+  (fmt (>= 0.9.0)))
  (tags
   (docker testing integration-testing containers testcontainers)))
 
@@ -46,9 +44,7 @@
  (description "PostgreSQL container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-redis)
@@ -56,9 +52,7 @@
  (description "Redis container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-rabbitmq)
@@ -66,9 +60,7 @@
  (description "RabbitMQ container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-mysql)
@@ -76,9 +68,7 @@
  (description "MySQL container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-mongo)
@@ -86,9 +76,7 @@
  (description "MongoDB container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-kafka)
@@ -96,9 +84,7 @@
  (description "Apache Kafka container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-elasticsearch)
@@ -106,9 +92,7 @@
  (description "Elasticsearch container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-localstack)
@@ -116,9 +100,7 @@
  (description "LocalStack (AWS emulation) container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-memcached)
@@ -126,9 +108,7 @@
  (description "Memcached container module for testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))
 
 (package
  (name testcontainers-mockserver)
@@ -136,6 +116,4 @@
  (description "MockServer container module for mocking HTTP services in testcontainers-ocaml")
  (depends
   (testcontainers (= :version))
-  (lwt_ppx (>= 2.1.0))
-  (alcotest (and :with-test (>= 1.7.0)))
-  (alcotest-lwt (and :with-test (>= 1.7.0)))))
+  (lwt_ppx (>= 2.1.0))))

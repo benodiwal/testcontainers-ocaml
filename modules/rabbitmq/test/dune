@@ -1,7 +1,0 @@
-(test
- (name test_rabbitmq_runner)
- (package testcontainers-rabbitmq)
- (modules test_rabbitmq_runner test_rabbitmq)
- (libraries testcontainers-rabbitmq alcotest alcotest-lwt lwt lwt.unix)
- (preprocess
-  (pps lwt_ppx)))

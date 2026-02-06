@@ -1,7 +1,0 @@
-(test
- (name test_elasticsearch_runner)
- (package testcontainers-elasticsearch)
- (modules test_elasticsearch_runner test_elasticsearch)
- (libraries testcontainers-elasticsearch alcotest alcotest-lwt lwt lwt.unix)
- (preprocess
-  (pps lwt_ppx)))
