@@ -6,7 +6,6 @@ Thank you for your interest in contributing to testcontainers-ocaml! This docume
 
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
-- [Project Structure](#project-structure)
 - [Making Changes](#making-changes)
 - [Adding a New Module](#adding-a-new-module)
 - [Testing](#testing)
@@ -26,11 +25,11 @@ Thank you for your interest in contributing to testcontainers-ocaml! This docume
 
 ```bash
 # Fork the repository on GitHub, then clone your fork
-git clone https://github.com/YOUR_USERNAME/testcontainers_ocaml.git
-cd testcontainers_ocaml
+git clone https://github.com/YOUR_USERNAME/testcontainers-ocaml.git
+cd testcontainers-ocaml
 
 # Add upstream remote
-git remote add upstream https://github.com/benodiwal/testcontainers_ocaml.git
+git remote add upstream https://github.com/benodiwal/testcontainers-ocaml.git
 ```
 
 ## Development Setup
@@ -97,37 +96,6 @@ dune fmt
 ```bash
 cd docs
 mdbook serve  # Serves at http://localhost:3000
-```
-
-## Project Structure
-
-```
-testcontainers_ocaml/
-├── lib/                    # Core library
-│   ├── container.ml        # Container lifecycle management
-│   ├── container_request.ml# Container configuration builder
-│   ├── docker_client.ml    # Docker API client
-│   ├── wait_strategy.ml    # Wait strategies
-│   ├── network.ml          # Docker network support
-│   ├── port.ml             # Port utilities
-│   ├── volume.ml           # Volume mount types
-│   ├── error.ml            # Error types
-│   └── testcontainers.ml   # Main module (re-exports)
-├── modules/                # Pre-built container modules
-│   ├── postgres/
-│   ├── mysql/
-│   ├── mongo/
-│   ├── redis/
-│   ├── rabbitmq/
-│   ├── kafka/
-│   ├── elasticsearch/
-│   ├── localstack/
-│   ├── memcached/
-│   └── mockserver/
-├── test/                   # Test files
-├── examples/               # Example code
-├── docs/                   # Documentation (mdbook)
-└── dune-project            # Dune project configuration
 ```
 
 ## Making Changes
