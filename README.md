@@ -32,8 +32,8 @@ let () = Lwt_main.run (
 
 ```bash
 # Clone the repository
-git clone https://github.com/benodiwal/testcontainers_ocaml.git
-cd testcontainers_ocaml
+git clone https://github.com/benodiwal/testcontainers-ocaml.git
+cd testcontainers-ocaml
 
 # Install dependencies
 opam install . --deps-only
