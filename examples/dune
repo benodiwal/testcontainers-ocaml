@@ -9,7 +9,8 @@
   elasticsearch_example
   localstack_example
   memcached_example
-  mockserver_example)
+  mockserver_example
+  rabbitmq_example)
  (libraries
   testcontainers
   testcontainers-postgres
@@ -21,6 +22,7 @@
   testcontainers-localstack
   testcontainers-memcached
   testcontainers-mockserver
+  testcontainers-rabbitmq
   lwt
   lwt.unix)
  (preprocess
