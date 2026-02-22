@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+staged_files="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if [ -z "$staged_files" ]; then
+  exit 0
+fi
+
+echo "[pre-commit] Running dune fmt..."
+fmt_status=0
+if command -v opam >/dev/null 2>&1; then
+  opam exec -- dune fmt || fmt_status=$?
+else
+  dune fmt || fmt_status=$?
+fi
+
+if [ "$fmt_status" -gt 1 ]; then
+  exit "$fmt_status"
+fi
+
+# Re-stage files that were already part of the commit.
+while IFS= read -r file; do
+  if [ -n "$file" ]; then
+    git add -- "$file"
+  fi
+done <<< "$staged_files"

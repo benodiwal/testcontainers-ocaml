@@ -349,6 +349,17 @@ profile = default
 
 Always run `dune fmt` before committing.
 
+### Optional: Auto-format on Commit
+
+This repository includes a pre-commit hook at `.githooks/pre-commit` that runs
+`dune fmt` automatically.
+
+Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ### Guidelines
 
 - Use descriptive names

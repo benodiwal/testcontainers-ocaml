@@ -94,6 +94,9 @@ dune build @fmt
 
 # Auto-format
 dune fmt
+
+# Optional: enable repository pre-commit hook
+git config core.hooksPath .githooks
 ```
 
 ### Documentation
