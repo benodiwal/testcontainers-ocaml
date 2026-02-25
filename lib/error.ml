@@ -11,6 +11,7 @@ type t =
   | Invalid_configuration of string
   | Image_pull_failed of { image : string; message : string }
   | Port_not_mapped of { container_port : int; protocol : string }
+  | Api_version_too_old of { daemon_version : string; min_version : string }
 
 exception Testcontainers_error of t
 
@@ -32,6 +33,11 @@ let to_string = function
       Printf.sprintf "Failed to pull image %s: %s" image message
   | Port_not_mapped { container_port; protocol } ->
       Printf.sprintf "Port %d/%s not mapped" container_port protocol
+  | Api_version_too_old { daemon_version; min_version } ->
+      Printf.sprintf
+        "Docker daemon API version %s is too old. Minimum supported version is \
+         %s, please upgrade your Docker daemon"
+        daemon_version min_version
 
 let raise_error err = raise (Testcontainers_error err)
 let fail_container_not_found id = raise_error (Container_not_found id)
@@ -43,3 +49,6 @@ let fail_invalid_config msg = raise_error (Invalid_configuration msg)
 
 let fail_wait_timeout ~strategy ~timeout =
   raise_error (Wait_timeout { strategy; timeout })
+
+let fail_api_version_too_old ~daemon_version ~min_version =
+  raise_error (Api_version_too_old { daemon_version; min_version })

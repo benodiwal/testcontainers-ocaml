@@ -7,7 +7,9 @@
 open Lwt.Syntax
 
 let docker_socket = "/var/run/docker.sock"
-let api_version = "v1.43"
+let max_api_version = "1.47"
+let min_api_version = "1.24"
+let negotiated_version : string option ref = ref None
 
 module Json = struct
   let get_string key json =
@@ -107,7 +109,47 @@ let connect_to_docker () =
   let* () = Lwt_unix.connect sock addr in
   Lwt.return sock
 
-let read_http_response ic =
+let compare_versions a b =
+  let parse v =
+    match String.split_on_char '.' v with
+    | [ major; minor ] ->
+        ( int_of_string_opt major |> Option.value ~default:0,
+          int_of_string_opt minor |> Option.value ~default:0 )
+    | [ major ] -> (int_of_string_opt major |> Option.value ~default:0, 0)
+    | _ -> (0, 0)
+  in
+  let a_major, a_minor = parse a in
+  let b_major, b_minor = parse b in
+  let c = compare a_major b_major in
+  if c <> 0 then c else compare a_minor b_minor
+
+let negotiate_version daemon_version =
+  if compare_versions daemon_version min_api_version < 0 then
+    Error.fail_api_version_too_old ~daemon_version ~min_version:min_api_version
+  else if compare_versions daemon_version max_api_version > 0 then
+    max_api_version
+  else daemon_version
+
+(* Helper to extract a header value from raw header lines *)
+let get_header_value header_name headers =
+  let target = String.lowercase_ascii header_name ^ ":" in
+  let target_len = String.length target in
+  List.find_map
+    (fun h ->
+      let h_lower = String.lowercase_ascii h in
+      if
+        String.length h_lower > target_len
+        && String.sub h_lower 0 target_len = target
+      then
+        let colon_pos = String.index h ':' in
+        Some
+          (String.trim
+             (String.sub h (colon_pos + 1) (String.length h - colon_pos - 1)))
+      else None)
+    headers
+
+(* Read HTTP response and return status, headers, and body *)
+let read_http_response_with_headers ic =
   (* Read status line *)
   let* status_line = Lwt_io.read_line ic in
   let status_code =
@@ -125,30 +167,14 @@ let read_http_response ic =
   let* headers = read_headers [] in
   (* Find content-length or transfer-encoding *)
   let content_length =
-    List.find_map
-      (fun h ->
-        let h_lower = String.lowercase_ascii h in
-        if
-          String.length h_lower > 15
-          && String.sub h_lower 0 14 = "content-length"
-        then
-          let colon_pos = String.index h ':' in
-          let value =
-            String.trim
-              (String.sub h (colon_pos + 1) (String.length h - colon_pos - 1))
-          in
-          Some (int_of_string value)
-        else None)
-      headers
+    match get_header_value "content-length" headers with
+    | Some v -> ( try Some (int_of_string v) with _ -> None)
+    | None -> None
   in
   let chunked =
-    List.exists
-      (fun h ->
-        let h_lower = String.lowercase_ascii h in
-        String.length h_lower > 17
-        && String.sub h_lower 0 17 = "transfer-encoding"
-        && String.contains h_lower 'c')
-      headers
+    match get_header_value "transfer-encoding" headers with
+    | Some v -> String.contains (String.lowercase_ascii v) 'c'
+    | None -> false
   in
   (* Read body *)
   let* body =
@@ -185,9 +211,56 @@ let read_http_response ic =
         in
         read_all []
   in
+  Lwt.return (status_code, headers, body)
+
+(* Original read_http_response - wrapper for backward compatibility *)
+let read_http_response ic =
+  let* status_code, _headers, body = read_http_response_with_headers ic in
   Lwt.return (status_code, body)
 
+let perform_version_negotiation () =
+  let* sock = connect_to_docker () in
+  let request =
+    "GET /_ping HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n"
+  in
+  let ic =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Input sock
+  in
+  let oc =
+    Lwt_io.of_fd ~close:(fun _ -> Lwt.return_unit) ~mode:Lwt_io.Output sock
+  in
+  let* status_code, headers, _body =
+    Lwt.finalize
+      (fun () ->
+        let* () = Lwt_io.write oc request in
+        let* () = Lwt_io.flush oc in
+        read_http_response_with_headers ic)
+      (fun () ->
+        let* () = Lwt_io.close oc in
+        let* () = Lwt_io.close ic in
+        Lwt_unix.close sock)
+  in
+  if status_code >= 200 && status_code < 500 then begin
+    let version =
+      match get_header_value "api-version" headers with
+      | Some v -> negotiate_version v
+      | None -> max_api_version
+    in
+    let versioned = "v" ^ version in
+    negotiated_version := Some versioned;
+    Lwt.return versioned
+  end
+  else
+    Error.fail_docker_error ~status:status_code
+      ~message:"Failed to ping Docker daemon for API version negotiation"
+
+let get_negotiated_version () =
+  match !negotiated_version with
+  | Some v -> Lwt.return v
+  | None -> perform_version_negotiation ()
+
 let make_request meth path ?body () =
+  let* version = get_negotiated_version () in
   let* sock = connect_to_docker () in
   let meth_str =
     match meth with
@@ -197,7 +270,7 @@ let make_request meth path ?body () =
     | `PUT -> "PUT"
     | `HEAD -> "HEAD"
   in
-  let full_path = Printf.sprintf "/%s%s" api_version path in
+  let full_path = Printf.sprintf "/%s%s" version path in
   let content_length =
     match body with Some b -> String.length b | None -> 0
   in
@@ -464,8 +537,9 @@ let stream_logs ?(stdout = true) ?(stderr = true) ?(tail = "all") ~on_log id =
     Printf.sprintf "/containers/%s/logs?stdout=%b&stderr=%b&follow=true&tail=%s"
       id stdout stderr tail
   in
+  let* version = get_negotiated_version () in
   let* sock = connect_to_docker () in
-  let full_path = Printf.sprintf "/%s%s" api_version path in
+  let full_path = Printf.sprintf "/%s%s" version path in
   let request =
     Printf.sprintf
       "GET %s HTTP/1.1\r\nHost: localhost\r\nConnection: keep-alive\r\n\r\n"
@@ -584,8 +658,9 @@ let put_archive id ~path ~data =
   let api_path =
     Printf.sprintf "/containers/%s/archive?path=%s" id encoded_path
   in
+  let* version = get_negotiated_version () in
   let* sock = connect_to_docker () in
-  let full_path = Printf.sprintf "/%s%s" api_version api_path in
+  let full_path = Printf.sprintf "/%s%s" version api_path in
   let content_length = String.length data in
   let header =
     Printf.sprintf
